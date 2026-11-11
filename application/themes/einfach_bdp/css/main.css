@@ -1,0 +1,2580 @@
+/* ============================================================
+   einfachBdP — Haupt-Stylesheet
+   BdP-Ortsgruppen · Auf Basis des BdP Corporate Design
+
+   Aufbau
+     01 Grundlagen        08 Kacheln & Karten
+     02 Typografie        09 Bild mit Info-Kästchen
+     03 CD-Striche        10 Termine · Downloads · Glossar · Galerie
+     04 Diagonalen        11 Formulare
+     05 Buttons & Links   12 Einbettungen mit Consent
+     06 Kopfbereich       13 Fußbereich
+     07 Hero              14 Concrete-Anpassungen · Bewegung · Druck
+
+   Lesehilfe  ✅ CD-Vorgabe · 🔶 abgeleitet
+   ============================================================ */
+
+
+/* ============================================================
+   01 Grundlagen
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 8rem;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-basis);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, svg, video { max-width: 100%; height: auto; }
+img { display: block; }
+
+/* Das hidden-Attribut muss gewinnen.
+
+   Der Browser bringt zwar [hidden] { display: none } mit, aber das ist
+   eine Regel ohne Klasse und verliert gegen jede eigene, die display
+   setzt. Konkret: Der „Weiter“-Knopf im letzten Schritt des
+   Aufnahmeantrags bekam hidden, blieb aber sichtbar, weil .btn
+   display: inline-flex vorgibt. Dasselbe träfe jedes andere
+   ausgeblendete Element mit eigener Anzeigeart. */
+[hidden] { display: none !important; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--c-rahmen);
+  margin-block: var(--sp-12);
+}
+
+/* Nur für Screenreader ✅ Pflicht für die Info-Schalter */
+.nur-sr {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Sprungmarke zum Inhalt — erstes fokussierbare Element der Seite */
+.sprung-zum-inhalt {
+  position: absolute;
+  left: var(--sp-4);
+  top: -100%;
+  z-index: 2000;
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  font-weight: 700;
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: 0 0 var(--radius) var(--radius);
+  transition: top var(--zeit-kurz) var(--kurve);
+}
+.sprung-zum-inhalt:focus { top: 0; }
+
+/* Sichtbarer Fokus ist Pflicht ✅ (WCAG 2.2 AA) */
+:focus-visible {
+  outline: 3px solid var(--c-fokus-dunkel);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Auf dunklem Grund reicht Blau nicht — dort Gelb */
+.auf-dunkel :focus-visible,
+.v-topbar :focus-visible,
+.v-fuss__balken :focus-visible,
+.v-hero :focus-visible { outline-color: var(--c-fokus); }
+
+
+/* Markierter Text in den Stammesfarben statt im Browserblau.
+   Wölflingsgelb mit Pfadiblau darauf: 7,00:1 ✅ AAA — und weil
+   beide Werte gesetzt sind, kann keine Kombination aus geerbter
+   Textfarbe und neuem Grund unlesbar werden. Genau das passiert
+   sonst auf den dunklen Flächen, wo helle Schrift auf dem hellen
+   Markierungsblau des Browsers landet.
+
+   Zwei Regeln statt einer Liste: Ein Browser, der ::-moz-selection
+   nicht kennt, verwirft sonst den ganzen Selektor mit. */
+::selection {
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  text-shadow: none;
+}
+::-moz-selection {
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  text-shadow: none;
+}
+
+/* Auf den gelben Flächen des Themes wäre Gelb auf Gelb nicht zu
+   sehen. Dort kehrt sich die Markierung um: Pfadiblau mit gelber
+   Schrift, 7,00:1 ✅ AAA in beide Richtungen. */
+.v-hinweis--gelb ::selection,
+.v-hinweis--gelb::selection,
+.v-etikett::selection {
+  background: var(--bdp-blau);
+  color: var(--bdp-gelb);
+}
+.v-hinweis--gelb ::-moz-selection,
+.v-hinweis--gelb::-moz-selection,
+.v-etikett::-moz-selection {
+  background: var(--bdp-blau);
+  color: var(--bdp-gelb);
+}
+
+
+/* ============================================================
+   02 Typografie
+   ============================================================ */
+
+/* Deutsche Komposita sind lang. „Datenschutzerklärung“ ist bei 36 px
+   384 px breit und passte auf einem 390-px-Telefon nicht in die Spalte;
+   die ganze Seite ließ sich dadurch seitwärts schieben.
+
+   hyphens: auto trennt nach den Regeln der Sprache, die im <html>-Tag
+   steht — deshalb ist lang="de" dort keine Formsache. Kann der Browser
+   nicht trennen, bricht overflow-wrap notfalls mitten im Wort. Das ist
+   hässlich, aber immer noch besser als eine verschobene Seite. */
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+
+  margin: 0 0 var(--sp-4);
+  color: var(--bdp-blau);
+  text-transform: none;      /* ✅ Headlines nie in Versalien */
+  text-wrap: balance;
+}
+h1, h2, h3 { font-weight: 900; }   /* ✅ Superfett */
+h4, h5, h6 { font-weight: 700; }   /* 🔶 Stark */
+
+h1 { font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: -.02em; }
+h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: -.01em; }
+h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+h4 { font-size: var(--fs-h4); line-height: var(--lh-h4); }
+h5 { font-size: var(--fs-h5); line-height: var(--lh-h4); }
+h6 { font-size: var(--fs-h6); line-height: var(--lh-h4); }
+
+p, ul, ol, dl, blockquote, table, figure { margin: 0 0 var(--sp-6); }
+p:last-child, ul:last-child, ol:last-child { margin-bottom: 0; }
+
+.lead, .subline {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--c-text-leise);
+  font-weight: 400;
+}
+
+/* Optimale Lesebreite für Fließtext ✅ 68ch */
+.lesebreite { max-width: var(--container-text); }
+
+/* Lesespalte für Artikelseiten 🔶
+   Etwas breiter als die reine Lesebreite, weil hier Bilder seitlich
+   mitlaufen. Ohne Bild sind das rund 85 Zeichen je Zeile, mit einem
+   Bild daneben rund 50. Über die volle Containerbreite von 1200 px
+   wären es 130 Zeichen, das liest sich nicht mehr. */
+.v-lesespalte { max-width: 50rem; }
+
+blockquote {
+  border-left: 5px solid var(--bdp-gelb);
+  padding: var(--sp-2) 0 var(--sp-2) var(--sp-6);
+  font-size: var(--fs-h4);
+  line-height: 1.4;
+  color: var(--bdp-blau);
+  font-style: italic;
+}
+
+small, .klein { font-size: var(--fs-klein); }
+strong, b { font-weight: 700; }
+
+/* MARKS-Akzent ✅ BdP-CD: „nur Versalien, nur für kurze Hervorhebungen"
+   Bewusst auf letter-spacing und text-transform gesetzt — MARKS ist als
+   Versalschnitt konzipiert, Kleinbuchstaben sähen falsch aus. Auch in
+   der Größe zurückgenommen: MARKS ist eine Stempelschrift, kein Display.
+   Verwendbar als Editor-Klasse „Akzent (MARKS)" auf span/p/h4..h6. */
+.v-akzent {
+  font-family: var(--font-akzent);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: var(--fs-klein);
+  line-height: 1.2;
+  color: var(--bdp-blau);
+}
+.v-akzent--blau-hell { color: var(--bdp-blau-hell); }
+.v-akzent--gelb      { color: var(--bdp-gelb); }
+.v-akzent--weiss     { color: var(--bdp-weiss); }
+
+/* Slogan-Baukasten ✅ „Einfach" + Wort, mit Punkt */
+.slogan {
+  font-weight: 900;
+  font-size: var(--fs-h2);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-klein);
+}
+table th, table td {
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--c-rahmen);
+  vertical-align: top;
+}
+table th { color: var(--bdp-blau); font-weight: 700; }
+table tbody tr:hover { background: var(--c-bg-gedaempft); }
+.tabelle-scroll { overflow-x: auto; margin-bottom: var(--sp-6); }
+
+
+/* ============================================================
+   03 CD-Striche — die gestrichelte Linie ✅
+   ------------------------------------------------------------
+   Aus dem Ikon-Set übernommen und als wiederholbarer Verlauf
+   nachgebaut, damit sie in jeder Breite gleich aussieht.
+   Striche laufen ✅ ausschließlich waagerecht.
+   ============================================================ */
+
+.strich {
+  --strich-farbe: var(--bdp-gelb);
+  --strich-laenge: 20px;
+  --strich-luecke: 12px;
+  --strich-staerke: 5px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--strich-farbe) 0 var(--strich-laenge),
+    transparent var(--strich-laenge)
+      calc(var(--strich-laenge) + var(--strich-luecke))
+  );
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% var(--strich-staerke);
+  padding-bottom: calc(var(--strich-staerke) + 6px);
+}
+.strich--blau { --strich-farbe: var(--bdp-blau); }
+.strich--gelb { --strich-farbe: var(--bdp-gelb); }
+.strich--rot  { --strich-farbe: var(--bdp-rot); }
+.strich--fein { --strich-staerke: 3px; --strich-laenge: 14px; --strich-luecke: 9px; }
+
+/* Eigenständiger Trenner statt Unterstrich */
+.trennstrich {
+  height: 5px;
+  border: 0;
+  margin: var(--sp-12) 0;
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-blau) 0 20px, transparent 20px 32px);
+}
+
+/* Headline mit Strich darunter — CD-Muster „Linie hebt Headline hervor" ✅
+
+   Die Größe ist eine Stufe unter der freien Überschrift: h2.mit-strich
+   nimmt die h3-Skala, h3.mit-strich die h4. Der Strich trägt bereits
+   Gewicht, die Schrift muss es nicht noch einmal tun — bei 3rem plus
+   Strich plus Abstand kostete eine Zwischenüberschrift über 100 px
+   Höhe und drängte den Text, um den es geht, unter die Falz.
+
+   Der Strich sitzt direkt an der Grundlinie statt 12 px darunter.
+   Er gehört zur Überschrift; die Luft danach setzt der Rand. */
+.mit-strich {
+  display: inline-block;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+}
+h3.mit-strich,
+h4.mit-strich {
+  font-size: var(--fs-h4);
+  line-height: var(--lh-h4);
+}
+.mit-strich::after {
+  content: "";
+  display: block;
+  height: 4px;
+  margin-top: 0;
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 20px, transparent 20px 32px);
+}
+
+
+/* ============================================================
+   04 Diagonalen — der Kohtenanschnitt im Web 🔶
+   ------------------------------------------------------------
+   Als clip-path gebaut, nicht als PNG: skaliert verlustfrei und
+   bleibt responsiv. CD-Regeln: ✅ nur EIN Anschnitt pro Fläche,
+   ✅ immer am Rand, ✅ nur in den Primärfarben.
+   ============================================================ */
+
+.keil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------
+   04a Der Kopf-Anschnitt — EIN Element, eine gerade Kante
+   ------------------------------------------------------------------
+   .v-keil steht in .v-hero (Startseite) bzw. .v-seitenkopf (alle
+   anderen Seiten) und ragt nach oben über sein Elternelement hinaus,
+   bis an den oberen Rand der Seite. Der weiße Kopf liegt mit z-index 50
+   darüber und verdeckt das Mittelstück. Sichtbar bleiben zwei Segmente
+   — in der Topbar und im Hero — die auf derselben Geraden liegen.
+
+   Stapelung:  Topbar 10  <  Hero/Seitenkopf 20  <  Kopf 50
+   ------------------------------------------------------------------ */
+
+.v-keil {
+  position: absolute;
+  top: calc(-1 * var(--keil-hoch));
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: var(--keil-breite);
+  background: var(--bdp-gelb);
+  clip-path: polygon(var(--keil-oben) 0, 100% 0, 100% 100%, var(--keil-unten) 100%);
+  pointer-events: none;
+}
+
+/* Schmale und hochkant Bildschirme: Der Keil endet am unteren Rand des
+   Kopfes und ist damit im Hero gar nicht mehr zu sehen — dort nimmt er
+   sonst zu viel Fläche. In der Topbar bleibt er als Akzent stehen. */
+@media (max-width: 700px), (orientation: portrait) and (max-width: 900px) {
+  .v-keil {
+    bottom: auto;
+    height: var(--keil-hoch);   /* endet genau am oberen Rand des Heros */
+  }
+}
+
+/* Anschnitt von rechts — die Leitform der beiden Vorlagen */
+.keil--rechts {
+  left: auto;
+  width: clamp(180px, 34%, 720px);
+  background: var(--bdp-gelb);
+  clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Anschnitt von links */
+.keil--links {
+  right: auto;
+  width: clamp(180px, 34%, 720px);
+  background: var(--bdp-gelb);
+  clip-path: polygon(0 0, 76% 0, 100% 100%, 0 100%);
+}
+
+/* Ganze Fläche schräg angeschnitten — für Sektionen */
+.schraeg-oben    { clip-path: polygon(0 0, 100% var(--diagonale), 100% 100%, 0 100%); }
+.schraeg-oben-l  { clip-path: polygon(0 var(--diagonale), 100% 0, 100% 100%, 0 100%); }
+.schraeg-unten   { clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--diagonale)), 0 100%); }
+.schraeg-unten-l { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - var(--diagonale))); }
+
+
+/* ============================================================
+   05 Buttons & Links
+   ============================================================ */
+
+a {
+  color: var(--c-link);
+  text-decoration-thickness: 2px;
+  text-underline-offset: .18em;
+  transition: color var(--zeit-kurz) var(--kurve);
+}
+a:hover { color: var(--c-link-hover); }
+
+.btn,
+.ccm-form input[type="submit"],
+.ccm-form button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-8);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: var(--c-btn-primaer-bg);
+  color: var(--c-btn-primaer-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+  /* Ein Knopf mit einer langen E-Mail-Adresse darin war auf 390 px
+     41 px breiter als der Bildschirm und schob die ganze Seite
+     seitwärts. Beides zusammen ist nötig: max-width verhindert, dass
+     er über den Container hinauswächst, overflow-wrap bricht das lange
+     Wort, das sonst gar nicht umbrechen könnte. */
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  transition: background var(--zeit-kurz) var(--kurve),
+              transform  var(--zeit-kurz) var(--kurve),
+              box-shadow var(--zeit-kurz) var(--kurve);
+}
+.btn:hover,
+.ccm-form input[type="submit"]:hover,
+.ccm-form button[type="submit"]:hover {
+  background: var(--bdp-blau-dunkel);
+  color: var(--c-btn-primaer-text);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(11, 35, 65, .22);
+}
+.btn:active { transform: translateY(0); }
+
+/* Gelber Button: Blau auf Gelb = 7,00:1 ✅ AAA */
+.btn--gelb {
+  background: var(--c-btn-sekundaer-bg);
+  color: var(--c-btn-sekundaer-text);
+}
+.btn--gelb:hover { background: var(--bdp-gelb-hell); color: var(--bdp-blau); }
+
+.btn--rot { background: var(--c-btn-gefahr-bg); color: var(--c-btn-gefahr-text); }
+.btn--rot:hover { background: var(--bdp-rot-dunkel); }
+
+.btn--linie {
+  background: transparent;
+  border-color: var(--bdp-blau);
+  color: var(--bdp-blau);
+}
+.btn--linie:hover { background: var(--bdp-blau); color: var(--bdp-weiss); }
+
+/* Auf dunklem Grund ist der Umriss-Knopf kein Umriss mehr.
+
+   Im Hero stand blauer Text auf einem abgedunkelten Foto — je nach
+   Bildausschnitt zwischen 1,2:1 und 2:1, also praktisch unlesbar. Ein
+   durchsichtiger Knopf braucht einen Grund, dessen Helligkeit man
+   kennt; über einem Foto kennt man sie nicht.
+
+   Deshalb hier eine gefüllte Fläche: Pfadiblau mit weißem Text
+   (10,15:1 ✅ AAA) und einem weißen Rand, der ihn auch von einem
+   dunklen Bildbereich abhebt. Beim Überfahren dreht er auf Gelb mit
+   blauem Text (7,00:1 ✅ AAA) — er hebt also weiterhin hervor, nur
+   eben von lesbar nach lesbar. */
+.auf-dunkel .btn--linie,
+.v-sektion--blau .btn--linie {
+  background: var(--bdp-blau);
+  border-color: var(--bdp-weiss);
+  color: var(--bdp-weiss);
+}
+.auf-dunkel .btn--linie:hover,
+.v-sektion--blau .btn--linie:hover {
+  background: var(--bdp-gelb);
+  border-color: var(--bdp-gelb);
+  color: var(--bdp-blau);
+}
+
+.btn--hell {
+  background: var(--bdp-weiss);
+  color: var(--bdp-blau);
+}
+.btn--hell:hover { background: var(--bdp-gelb); color: var(--bdp-blau); }
+
+.btn--klein { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-klein); }
+
+/* Textlink mit Pfeil, der beim Hover mitläuft */
+.pfeil-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 700;
+  text-decoration: none;
+}
+.pfeil-link::after {
+  content: "→";
+  transition: transform var(--zeit-mittel) var(--kurve);
+}
+.pfeil-link:hover::after { transform: translateX(5px); }
+
+
+/* ============================================================
+   06 Kopfbereich
+   ============================================================ */
+
+/* --- Meta-Topbar: schmaler blauer Streifen ✅ Vorlage ---
+   Der gelbe Anschnitt gehört nicht mehr hierher. Er kommt als EIN
+   durchgehendes Element aus dem Hero bzw. Seitenkopf nach oben
+   (siehe Abschnitt 04a) und legt sich über diesen Streifen.
+   Deshalb liegt die Topbar bewusst unter dem Hero (z-index 10 < 20). */
+.v-topbar {
+  position: relative;
+  z-index: 10;
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  font-size: var(--fs-winzig);
+  letter-spacing: .09em;
+  font-weight: 700;
+}
+.v-topbar__innen {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-6);
+  min-height: var(--h-topbar);
+}
+.v-topbar__gruppe { display: flex; gap: var(--sp-6); align-items: center; }
+.v-topbar a {
+  color: inherit;
+  text-decoration: none;
+  padding-block: var(--sp-2);
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--zeit-kurz) var(--kurve);
+}
+.v-topbar__gruppe--links a:hover { border-bottom-color: var(--bdp-gelb); }
+/* Die rechte Gruppe hält Abstand zum gelben Keil und steht damit auf
+   Blau — Weiß auf Pfadiblau = 10,15:1 ✅ AAA */
+.v-topbar__gruppe--rechts { padding-right: var(--keil-breite); }
+.v-topbar__gruppe--rechts a:hover { border-bottom-color: var(--bdp-gelb); }
+
+@media (max-width: 767px) {
+  .v-topbar__gruppe--links { display: none; }
+  .v-topbar__innen { justify-content: flex-end; }
+}
+
+/* --- Kopf: weiß und ruhig ✅ Vorlage --- */
+.v-kopf {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bdp-weiss);
+  transition: box-shadow var(--zeit-mittel) var(--kurve);
+}
+.v-kopf.ist-gescrollt { box-shadow: 0 2px 14px rgba(11, 35, 65, .12); }
+
+.v-kopf__innen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-8);
+  min-height: var(--h-kopf);
+  padding-block: var(--sp-3);
+}
+
+/* Logo — Schutzraum ≈ 28 % der Logohöhe rundum ✅
+   Das Stammeslogo steht hochkant (466 × 542 nach dem Beschnitt) und ist
+   damit bei gleicher Höhe rund 75 px schmaler als die BdP-Wortmarke
+   davor. Genau der Platz, der der Navigation gefehlt hat.
+   Der Schutzraum liegt als padding an und wird per negativem margin
+   wieder aus dem Fluss genommen: er hält andere Elemente fern, treibt
+   die Kopfzeile aber nicht auseinander. */
+.v-logo {
+  --logo-hoehe: 52px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  text-decoration: none;
+  padding: calc(var(--logo-hoehe) * .28);
+  /* Rechts kein Schutzraum: Dort steht die Navigation bzw. der
+     Burger, und deren eigener Abstand reicht. Der negative
+     Außenabstand muss auf derselben Seite mit weg — sonst zöge er
+     die Nachbarn um den Betrag heran, den das Polster gerade
+     hergegeben hat, und die Kopfzeile rückte doppelt zusammen. */
+  padding-right: 0;
+  margin: calc(var(--logo-hoehe) * -.28);
+  margin-right: 0;
+  flex-shrink: 0;
+}
+.v-logo img { height: var(--logo-hoehe); width: auto; }
+.v-logo__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.v-logo__name {
+  font-weight: 900;
+  font-size: 1.125rem;
+  color: var(--bdp-blau);
+  letter-spacing: -.01em;
+}
+.v-logo__zusatz {
+  font-size: var(--fs-winzig);
+  color: var(--c-text-leise);
+  letter-spacing: .04em;
+}
+.v-logo__einstellungen {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 13px 0 11px;
+  border-radius: 18px;
+  background: rgba(14,66,120,.12);
+  color: var(--bdp-blau);
+  font-size: 20px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-left: 10px;
+  border: 1.5px solid rgba(14,66,120,.35);
+  white-space: nowrap;
+  transition: background .15s, border-color .15s;
+}
+.v-logo__einstellungen .v-logo__einstellungen-text {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.v-logo__einstellungen:hover {
+  background: rgba(14,66,120,.18);
+  border-color: var(--bdp-blau);
+}
+.v-logo__einstellungen:hover .v-logo__einstellungen-text {
+  display: inline;
+}
+.v-kopf__logo-gruppe {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+/* Der Schriftzug fällt erst ganz zum Schluss weg. 575px war zu
+   früh: Auf einem gewöhnlichen Telefon blieb dann nur das Sechseck
+   stehen, und der Stammesname — das Wichtigste im Kopf — war weg,
+   obwohl daneben Platz war. Ab 360px wird es tatsächlich eng. */
+@media (max-width: 360px) {
+  .v-logo__text { display: none; }
+}
+
+/* --- Hauptnavigation --- */
+.v-nav { display: flex; align-items: center; }
+/* Der Abstand war so groß, dass Logo und Navigation zusammen breiter
+   wurden als der Inhalt darunter. Gemessen bei 1024 px Fensterbreite:
+   der letzte Navigationspunkt endete 102 px rechts von der Innenkante
+   des Inhaltscontainers. Enger gestellt und zusammen mit dem
+   schmaleren Stammeslogo passt die Kopfzeile wieder in --container. */
+.v-nav__liste {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--sp-3), 1.4vw, var(--sp-6));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.v-nav__punkt { position: relative; }
+.v-nav__link {
+  display: block;
+  padding: var(--sp-3) 0;
+  color: var(--bdp-blau);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 18px, transparent 18px 29px);
+  background-repeat: no-repeat;
+  background-position: 0 calc(100% - 6px);
+  background-size: 0% 4px;                    /* ✅ gestrichelte gelbe Linie */
+  transition: background-size var(--zeit-mittel) var(--kurve);
+}
+.v-nav__punkt:hover > .v-nav__link,
+.v-nav__punkt:focus-within > .v-nav__link,
+.v-nav__link[aria-current="page"],
+.v-nav__link.ist-aktiv { background-size: 100% 4px; }
+
+/* --- Dropdown: weiße Karte mit Schatten ✅ Vorlage --- */
+.v-nav__unter {
+  position: absolute;
+  top: 100%;
+  left: -var(--sp-6);
+  left: calc(var(--sp-6) * -1);
+  /* Ohne die Beschreibungen darunter reicht deutlich weniger Breite. */
+  min-width: 13rem;
+  margin: 0;
+  padding: var(--sp-4) var(--sp-6);
+  list-style: none;
+  background: var(--bdp-weiss);
+  box-shadow: var(--schatten-menue);
+  border-radius: 0 0 var(--radius) var(--radius);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity var(--zeit-mittel) var(--kurve),
+              transform var(--zeit-mittel) var(--kurve),
+              visibility 0s linear var(--zeit-mittel);
+}
+.v-nav__punkt:hover > .v-nav__unter,
+.v-nav__punkt:focus-within > .v-nav__unter {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+/* Die Dropdowns der rechten Punkte klappen nach innen auf. Sonst
+   ragen sie über den rechten Seitenrand hinaus — und zwar auch im
+   geschlossenen Zustand, weil visibility: hidden den Platz weiterhin
+   belegt und damit die Seite verbreitert. */
+.v-nav__punkt:nth-last-child(-n+2) > .v-nav__unter {
+  left: auto;
+  right: calc(var(--sp-6) * -1);
+}
+
+.v-nav__unter li + li { margin-top: var(--sp-2); }
+
+/* --- Navigation im Bearbeitungsmodus ------------------------------
+   Alles offen, nichts überlagert etwas.
+
+   Die aufklappende Karte liegt normalerweise absolut über dem
+   Inhalt. Beim Bearbeiten legt Concrete eigene Ebenen darüber:
+   Bereichsrahmen, Blockmenüs, die Werkzeugleiste. Wer dort einen
+   z-index gewinnt, verliert den anderen — entweder ist das Menü
+   nicht bedienbar oder das Blockmenü darunter.
+
+   Deshalb wird die Karte hier zur normalen Liste im Fluss: kein
+   position: absolute, kein Aufklappen, keine Überlagerung. Die
+   Kopfzeile wird dadurch höher, was beim Bearbeiten nicht stört —
+   sie steht ohnehin nicht mehr fest oben (siehe Abschnitt 14).
+   ------------------------------------------------------------------ */
+/* Bewusst gedrängt: Das ist eine Arbeitsansicht, kein Layout.
+
+   Jeder Millimeter, den der Baum belegt, fehlt beim Bearbeiten des
+   eigentlichen Inhalts. Deshalb kleine Schrift, enge Zeilen und
+   schmale Spalten — lesbar muss es sein, hübsch nicht. */
+.v-nav--baum {
+  display: block;
+  width: 100%;
+  padding-block: 2px 4px;
+  font-size: var(--fs-klein);
+  line-height: 1.25;
+}
+
+.v-nav--baum .v-nav__notiz {
+  margin: 0 0 2px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--c-text-leise);
+  font-style: italic;
+}
+
+/* Flex mit Umbruch, kein Raster.
+
+   Ein Raster gibt allen Spalten dieselbe Breite — die schmalste
+   Rubrik bekommt genauso viel wie die breiteste, und rechts daneben
+   steht Luft. Flex
+   lässt jede Spalte so breit werden, wie ihr längster Eintrag ist,
+   und bricht erst um, wenn es nicht mehr passt. Für eine reine
+   Arbeitsansicht ist das die sparsamere Anordnung. */
+.v-nav--baum .v-nav__liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--sp-4);
+  align-items: flex-start;
+}
+
+.v-nav--baum .v-nav__punkt {
+  position: static;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Keine Bewegung, keine Striche, nur Farbe.
+
+   Beim Bearbeiten springt man ständig zwischen Seiten; ein
+   einfahrender Unterstrich oder ein Pfeil, der mitläuft, kostet
+   jedes Mal einen Wimpernschlag Aufmerksamkeit und lenkt vom
+   Inhalt ab, um den es geht. Die Rückmeldung beim Überfahren
+   bleibt trotzdem da — sie ist nur farbig statt bewegt.
+
+   Farbe allein genügt hier ausnahmsweise: Es geht nicht darum,
+   Links als Links erkennbar zu machen (das tun Position und
+   Kontext), sondern nur um die Hover-Rückmeldung ✅ */
+.v-nav--baum,
+.v-nav--baum * {
+  transition: none !important;
+  animation: none !important;
+}
+
+.v-nav--baum .v-nav__link,
+.v-nav--baum .v-nav__unter a,
+.v-nav--baum .v-nav__link.ist-aktiv,
+.v-nav--baum .v-nav__link[aria-current="page"],
+.v-nav--baum .v-nav__punkt:hover > .v-nav__link,
+.v-nav--baum .v-nav__punkt:focus-within > .v-nav__link {
+  background-image: none;
+  background-size: 0 0;
+  text-decoration: none;
+  transform: none;
+}
+
+.v-nav--baum a:hover,
+.v-nav--baum a:focus-visible {
+  color: var(--bdp-rot);
+  text-decoration: none;
+}
+
+/* Die aktuelle Seite bleibt erkennbar — ohne Strich, dafür fett
+   und in Pfadiblau, während der Rest gedeckt bleibt. */
+.v-nav--baum .v-nav__unter a[aria-current="page"],
+.v-nav--baum .v-nav__link[aria-current="page"] {
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+.v-nav--baum .v-nav__unter a { color: var(--c-text-leise); }
+
+/* Ein Punkt samt Unterpunkten ist beim Redigieren eine Einheit —
+   also färbt sich beim Überfahren die ganze Gruppe, nicht nur die
+   Zeile unter dem Zeiger. Das zeigt zugleich, was zusammengehört,
+   wo im Flex-Umbruch die Zuordnung sonst nicht immer eindeutig
+   ist. Farbe allein genügt hier: Es ist eine Hover-Rückmeldung,
+   keine Bedeutungsträgerin ✅ WCAG 1.4.1 */
+.v-nav--baum .v-nav__punkt:hover a,
+.v-nav--baum .v-nav__punkt:focus-within a {
+  color: var(--bdp-rot);
+}
+
+/* Der Pfeil, der im Untermenü sonst beim Überfahren mitläuft. */
+.v-nav--baum .v-nav__unter-titel { transform: none !important; }
+
+.v-nav--baum .v-nav__link {
+  padding: 0;
+  font-size: var(--fs-klein);
+  white-space: normal;
+}
+
+.v-nav--baum .v-nav__unter {
+  position: static;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 0 6px;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  border-left: 2px solid var(--c-rahmen);
+}
+
+.v-nav--baum .v-nav__unter li + li { margin-top: 0; }
+
+.v-nav--baum .v-nav__unter a {
+  background-image: none;
+  padding: 0;
+  font-size: var(--fs-winzig);
+  line-height: 1.3;
+}
+
+/* Die Regel für die rechten Punkte gilt hier nicht — es klappt ja
+   nichts mehr auf. */
+.v-nav--baum .v-nav__punkt:nth-last-child(-n+2) > .v-nav__unter {
+  left: auto;
+  right: auto;
+}
+.v-nav__unter a {
+  display: block;
+  padding: var(--sp-3) 0;
+  text-decoration: none;
+  /* gestrichelte blaue Trennlinie zwischen den Einträgen ✅ Vorlage */
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-blau) 0 16px, transparent 16px 27px);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 3px;
+}
+.v-nav__unter li:last-child a { background-image: none; }
+.v-nav__unter-titel {
+  display: block;
+  font-weight: 700;
+  color: var(--bdp-blau);
+  transition: transform var(--zeit-kurz) var(--kurve);
+}
+.v-nav__unter a:hover .v-nav__unter-titel { transform: translateX(4px); }
+
+/* --- Burger & mobiles Overlay --- */
+.v-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 48px; height: 48px;
+  /* Links kein Polster, rechts 10px: Die Balken beginnen damit an
+     der linken Kante der 48px-Fläche. Die Fläche selbst bleibt
+     48 × 48 und damit groß genug zum Treffen ✅ WCAG 2.5.8 */
+  padding: 0 10px 0 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.v-burger span {
+  display: block;
+  height: 3px;
+  background: var(--bdp-blau);
+  border-radius: 2px;
+  transition: transform var(--zeit-mittel) var(--kurve),
+              opacity   var(--zeit-kurz)  var(--kurve);
+}
+.v-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.v-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.v-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+@media (max-width: 991px) {
+  .v-burger { display: flex; }
+
+  /* Logo und Burger liegen im selben Stapelkontext wie das Overlay und
+     müssen deshalb ausdrücklich darüber. Sonst verdeckt das offene Menü
+     seinen eigenen Schließen-Knopf. */
+  .v-logo, .v-burger { position: relative; z-index: 120; }
+
+  /* Bei offenem Menü bleibt nur der Schließen-Knopf oben stehen.
+     ------------------------------------------------------------
+     Vorher ragten Logo und Burger gemeinsam durch das Overlay, das
+     Logo blieb also über dem Menü kleben. Auf einem Telefon kostete
+     das die oberen Pixel doppelt: einmal das Logo selbst, einmal
+     die 7,5 rem Innenabstand, mit denen das Menü darunter
+     wegtauchen musste. Bei sieben Punkten scrollte man, obwohl das
+     Menü auf den Schirm gepasst hätte.
+
+     Gebraucht wird es dort nicht — es führt zur Startseite, und die
+     steht im offenen Menü als erster Punkt.
+
+     z-index: auto und nicht display: none: Der Knopf daneben soll
+     sich beim Öffnen keinen Pixel bewegen, und dafür muss die
+     Kopfzeile so stehen bleiben, wie sie ist. Das Overlay legt sich
+     dann einfach darüber. */
+  body.menue-offen .v-logo {
+    z-index: auto;
+    pointer-events: none;
+  }
+
+  /* Der Schließen-Knopf löst sich aus der Kopfzeile.
+     ----------------------------------------------------------------
+     Solange er dort blieb, musste das Menü die ganze Kopfzeile
+     freihalten — 125 px, in denen nichts stand als ein ✕ in der
+     Ecke. Als schwebender Knopf braucht er nur noch sich selbst;
+     das Menü beginnt 60 px weiter oben.
+
+     Die weiße Scheibe ist kein Zierrat: Das Menü scrollt unter dem
+     Knopf hindurch, und ohne sie liefe eine Rubrik mitten durch das
+     ✕. Sie war vorher der Streifen über die volle Breite, jetzt ist
+     sie so groß wie der Knopf.
+
+     44 × 44 ✅ WCAG 2.5.8 */
+  body.menue-offen .v-burger {
+    position: fixed;
+    top: var(--sp-2);
+    right: var(--sp-2);
+    z-index: 130;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-items: center;
+    border-radius: 50%;
+    background: var(--bdp-weiss);
+    box-shadow: 0 2px 10px rgba(11, 35, 65, .18);
+  }
+  /* Ohne Breitenbegrenzung wären die Balken so breit wie der Knopf,
+     und aus dem ✕ würde ein Kreuz über die ganze Scheibe. */
+  body.menue-offen .v-burger span { width: 22px; }
+
+  .v-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: block;
+    /* Oben nur so viel, dass der schwebende ✕ nicht auf dem ersten
+       Menüpunkt sitzt: 8 px Abstand + 44 px Knopf + 12 px Luft.
+       Vorher hielt das Menü die gesamte Kopfzeile frei — 125 px, in
+       denen nichts stand. */
+    padding: calc(var(--sp-2) + 44px + var(--sp-3)) var(--gutter) var(--sp-6);
+    background: var(--bdp-weiss);
+    overflow-y: auto;
+    /* Am Ende der Liste nicht die Seite darunter mitziehen. */
+    overscroll-behavior: contain;
+    opacity: 0;
+    visibility: hidden;
+    /* Zweite Absicherung gegen Klicks im geschlossenen Zustand: das
+       Overlay liegt als position:fixed über der ganzen Seite, und
+       opacity allein fängt keine Klicks ab. */
+    pointer-events: none;
+    transform: translateY(-1.5rem);
+    transition: opacity var(--zeit-mittel) var(--kurve),
+                transform var(--zeit-mittel) var(--kurve),
+                visibility 0s linear var(--zeit-mittel);
+  }
+  .v-nav.ist-offen {
+    opacity: 1; visibility: visible; transform: none; transition-delay: 0s;
+    pointer-events: auto;
+  }
+
+  /* Das offene Menü
+     ================================================================
+     Ausgangslage: 1040 px Inhalt in einem 800 px hohen Fenster. Man
+     scrollte, um an den letzten Punkt zu kommen, obwohl es nur
+     sieben Rubriken sind. Der Platz ging fast vollständig an die 19
+     Unterpunkte, die alle gleichzeitig offen standen.
+
+     Deshalb jetzt: Rubriken als kurze Zeilenliste, Unterpunkte
+     einzeln aufklappbar. Offen ist beim Öffnen genau der Zweig, in
+     dem man gerade steht — der einzige, den man mit einiger
+     Wahrscheinlichkeit gleich braucht.
+
+     Ich habe das beim letzten Mal bewusst nicht gemacht, weil ein
+     Aufklappen einen Fingertipp mehr kostet und verbirgt, was es
+     überhaupt gibt. Der zweite Punkt bleibt richtig — deswegen
+     stehen alle sieben Rubriken weiterhin zusammen auf dem Schirm,
+     und was verborgen ist, ist immer nur die Ebene darunter. Der
+     erste Punkt wiegt gegen 500 px Scrollstrecke nicht auf.
+
+     Gerechnet: 7 Zeilen zu 47 px = 329 px, dazu der Kopfstreifen und
+     ein offener Zweig. Zusammen rund 600 px statt 1040 — es passt
+     wieder auf einen Schirm. */
+  .v-nav__liste { flex-direction: column; align-items: stretch; gap: 0; }
+
+  /* Eine Rubrik samt ihrer Unterpunkte ist ein Block; die Haarlinie
+     trennt die Blöcke. Sie ist auf dieser Breite der einzige Strich —
+     die gestrichelte gelbe Linie entfällt mobil ganz (siehe unten). */
+  .v-nav__punkt {
+    display: block;
+    border-bottom: 1px solid var(--c-rahmen);
+  }
+  .v-nav__punkt:last-child { border-bottom: 0; }
+  .v-nav__punkt + .v-nav__punkt { border-top: 0; }
+
+  .v-nav__link {
+    font-size: 1.0625rem;
+    /* Unten weniger als oben: Darunter stehen die eigenen
+       Unterpunkte, darüber die fremde Rubrik. Der Abstand gehört
+       dorthin, wo die Grenze ist. */
+    padding: var(--sp-3) 0 var(--sp-2);
+    /* Mobil trägt die gestrichelte gelbe Linie nichts mehr bei. Im
+       aufgeklappten Overlay stehen die Rubriken ohnehin untereinander,
+       und ein waagerechter Strich unter einer Zeile liest sich dort
+       eher als Trenner denn als Auszeichnung — das Trennen erledigt
+       schon die Haarlinie an .v-nav__punkt. Deshalb hier gar kein
+       Hintergrundbild; das CD-Element bleibt dem Desktop vorbehalten,
+       wo es waagerecht neben den anderen Rubriken steht und als
+       Auszeichnung auch als solche gelesen wird. */
+    background-image: none;
+  }
+
+  .v-nav__unter {
+    position: static;
+    /* inherit, nicht visible: Auf dem Desktop ist .v-nav__unter das
+       ausgeklappte Dropdown und deshalb von Haus aus hidden. Mobil muss
+       es dem Zustand des Overlays folgen — mit visible würde es das
+       visibility: hidden des geschlossenen Overlays aufheben (visibility
+       wird vererbt, ein Kind darf sie zurückholen). Die Untermenüs wären
+       dann unsichtbar, aber anklickbar und per Tab erreichbar und hätten
+       über der ganzen Seite Klicks abgefangen. */
+    visibility: inherit;
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
+    border-radius: 0;
+    background: none;
+    min-width: 0;
+    margin: 0;
+    /* Eingerückt statt eingerahmt.
+       ------------------------------------------------------------
+       Vorher stand hier ein gelber Balken, danach waren es Marken mit
+       Rand und runder Ecke. Beides hat die Unterpunkte zu etwas
+       gemacht, was sie nicht sind — eine Auszeichnung. Sie sind
+       schlicht die Ebene darunter, und das zeigt am ruhigsten eine
+       Einrückung: kein Rahmen, keine Fläche, keine Form.
+
+       Damit sie trotzdem nicht mit der Rubrik darüber verschwimmen,
+       stehen sie in normaler Strichstärke und in Kohteschwarz,
+       während die Rubrik fett in Pfadiblau bleibt. */
+    padding: 0 0 var(--sp-2) var(--sp-4);
+
+    /* Zwei Spalten, solange sie hineinpassen.
+       ------------------------------------------------------------
+       Ohne Aufklappen stehen alle 19 Unterpunkte gleichzeitig da.
+       Untereinander wären das rund 600 px allein für die zweite
+       Ebene; nebeneinander sind es 330.
+
+       auto-fill mit Mindestbreite statt fest zwei Spalten: Wird es
+       zu eng, fällt es von selbst auf eine Spalte zurück, statt
+       Namen mitten im Wort zu brechen. 7 rem als Maß — bei 320 px
+       Fensterbreite bleiben dem Untermenü 256 px, zwei Spalten zu
+       7 rem plus Spaltenabstand brauchen 236. */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+    column-gap: var(--sp-3);
+  }
+  /* Im Raster hat der Abstand zwischen Geschwistern nichts zu suchen:
+     Er trifft jedes Element außer dem ersten, also auch das erste der
+     zweiten Spalte — und das stand dann 8 px tiefer als sein Nachbar
+     links. Die Zeilen kippten. */
+  .v-nav__unter li { min-width: 0; }
+  .v-nav__unter li + li { margin-top: 0; }
+
+  .v-nav__unter a,
+  .v-nav__unter li:last-child a {
+    display: flex;
+    align-items: center;
+    /* 30 px hoch trotz der kleineren Schrift — darunter ist es mit
+       dem Finger nicht mehr sicher zu treffen ✅ WCAG 2.5.8 */
+    min-height: 30px;
+    padding: 0;
+    /* Die gestrichelte blaue Trennlinie der Desktop-Karte trennt hier
+       nichts: In zwei Spalten liefe sie quer durch die Liste. */
+    background-image: none;
+    font-size: var(--fs-klein);
+  }
+  /* Normal und in Kohteschwarz — 15,62:1 ✅ AAA. Fett und blau ist
+     die Rubrik darüber; wären es beide, stünde die Gliederung nur
+     noch in der Einrückung.
+
+     Der Pfeil-Versatz beim Überfahren gehört zur Desktop-Karte; im
+     Raster verschöbe er die Beschriftung gegen ihre Nachbarspalte. */
+  .v-nav__unter .v-nav__unter-titel,
+  .v-nav__unter a:hover .v-nav__unter-titel {
+    font-weight: 400;
+    color: var(--c-text);
+    transform: none;
+  }
+  /* Die Seite, auf der man steht: fett und in Pfadiblau — 10,15:1 ✅ */
+  .v-nav__unter a[aria-current="page"] .v-nav__unter-titel {
+    font-weight: 700;
+    color: var(--bdp-blau);
+  }
+
+  /* Im Bearbeitungsmodus gibt es kein Overlay: Der Baum steht auch auf
+     schmalen Schirmen offen im Fluss. Ein bildschirmfüllendes Menü
+     über der Seite wäre beim Bearbeiten genau das, was hier weg soll. */
+  .v-nav--baum {
+    position: static;
+    inset: auto;
+    padding: 2px 0 4px;
+    background: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+    overflow: visible;
+  }
+  .v-nav--baum .v-nav__liste { display: flex; flex-wrap: wrap; }
+  .v-nav--baum .v-nav__link { font-size: var(--fs-klein); padding: 0; }
+  /* Der Baum ist eine gedrängte Arbeitsansicht: keine Zeilenliste,
+     keine Spalten, keine Trennlinien. Was das mobile Menü aufbaut,
+     muss hier wieder herunter — sonst stünde der Seitenbaum beim
+     Redigieren in Telefonschrift und doppelter Höhe. */
+  .v-nav--baum .v-nav__punkt {
+    display: block;
+    border-bottom: 0;
+  }
+  .v-nav--baum .v-nav__punkt + .v-nav__punkt { border-top: 0; }
+  .v-nav--baum .v-nav__unter {
+    display: block;
+    border-left: 2px solid var(--c-rahmen);
+    margin-left: 0;
+    padding: 0 0 0 6px;
+  }
+  .v-nav--baum .v-nav__unter a,
+  .v-nav--baum .v-nav__unter li:last-child a {
+    display: block;
+    min-height: 0;
+    padding: 0;
+    font-size: var(--fs-winzig);
+  }
+  .v-nav--baum .v-nav__unter .v-nav__unter-titel {
+    font-weight: 700;
+    color: var(--bdp-blau);
+  }
+}
+
+/* Der Kopf trägt für Angemeldete den ganzen Seitenbaum. Er wird
+   dadurch mehrzeilig, und der Burger hat nichts mehr zu öffnen. */
+[data-angemeldet] .v-kopf__innen { flex-wrap: wrap; }
+[data-angemeldet] .v-burger { display: none; }
+
+body.menue-offen { overflow: hidden; }
+
+
+/* ============================================================
+   07 Hero ✅ Leitmotiv der beiden Vorlagen
+   ============================================================ */
+
+/* Der Hero ist eine echte Scroll-Spur: wischen, ziehen, mit dem Rad
+   oder der Tastatur blättern. Autoplay ergänzt das nur. Die Höhe steht
+   fest, damit der Keil (Abschnitt 04a) seine Länge berechnen kann. */
+.v-hero {
+  position: relative;
+  z-index: 20;
+  height: var(--hero-hoehe);
+  background: var(--bdp-blau-dunkel);
+  /* sichtbar bleiben, damit der Keil nach oben hinausragen kann */
+  overflow: visible;
+}
+
+.v-hero__spur {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  /* none und nicht contain.
+     ---------------------------------------------------------------
+     contain verhindert nur, dass sich das Scrollen auf die Seite
+     überträgt. Die Zurück-Geste des Browsers bleibt dabei erlaubt —
+     und genau die schlug zu, sobald die Spur auf der Kopie am linken
+     Rand stand und man weiterwischte: Statt zur letzten Folie
+     umzulaufen, ging der Browser eine Seite zurück.
+
+     Auf einem Bildwechsler, der von sich aus im Kreis läuft, hat die
+     Geste ohnehin nichts zu suchen — man wischt hier durch Bilder,
+     nicht durch die Verlaufsliste. */
+  overscroll-behavior-x: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+.v-hero__spur::-webkit-scrollbar { display: none; }
+/* Solange gezogen oder programmgesteuert gesprungen wird, ist das
+   Einrasten aus. Sonst zieht der Browser die Spur mitten in der
+   Bewegung auf den nächstgelegenen Rastpunkt zurück — beim Ziehen
+   sichtbar als Rucken, beim Rad als vollständiges Zurückspringen. */
+.v-hero__spur.wird-gezogen { cursor: grabbing; }
+.v-hero__spur.wird-gezogen,
+.v-hero__spur.wird-gefuehrt { scroll-snap-type: none; }
+.v-hero__spur:focus-visible { outline: 3px solid var(--c-fokus); outline-offset: -3px; }
+
+.v-hero__folie {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* start statt center: bei Folien, die genau so breit sind wie das
+     Sichtfenster, liegt der Rastpunkt sonst rechnerisch in der Mitte
+     und driftet mit jedem gerundeten Pixel. start ist die Kante. */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.v-hero__bild {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Beim Blättern fährt das Bild sanft auf Maßstab zurück */
+  transform: scale(1.06);
+  transition: transform 1.6s var(--kurve);
+}
+
+/* Zwei Klassen, zwei Aufgaben.
+
+   .ist-sichtbar sagt, welche Folie im Sichtfenster steht. Sie hängt
+   an genau einer Folie und ist der Zustand.
+
+   .ist-dran trägt alles Bewegte — den Bildzoom hier und die
+   Texteinblendung weiter unten. Sie liegt auf der Folie UND auf ihrer
+   Kopie am anderen Ende der Spur (die beiden Kopien machen den
+   endlosen Umlauf möglich, siehe theme.js). Beide zeigen dasselbe,
+   fangen im selben Moment an und laufen synchron. Wenn die Spur nach
+   der Animation still von der Kopie auf das Original umgesetzt wird,
+   stehen Bildmaßstab und Textposition auf beiden Seiten gleich — der
+   Sprung ist unsichtbar.
+
+   Hinge die Animation stattdessen an .ist-sichtbar, liefe sie beim
+   Umlauf zweimal kurz nacheinander.
+
+   .ist-sichtbar steht beim Bild trotzdem mit in der Regel: Die erste
+   Folie bringt sie schon aus dem HTML mit, damit ihr Bild vom ersten
+   Bild an auf Maßstab steht und nicht auf die Skripte wartet. */
+.v-hero__folie.ist-sichtbar .v-hero__bild,
+.v-hero__folie.ist-dran .v-hero__bild { transform: scale(1); }
+
+/* Leichte Abdunklung unten, damit die Headline sicher trägt */
+.v-hero__schleier {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top, rgba(11, 35, 65, .70) 0%, rgba(11, 35, 65, .20) 46%, transparent 74%);
+}
+
+.v-hero__innen {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding-block: var(--sp-16) var(--sp-24);
+}
+/* Text zieht beim Wechsel leicht nach. Er hängt an .ist-dran, nicht an
+   .ist-aktiv: .ist-aktiv wird schon beim Klick auf die Zielfolie
+   gesetzt — hinge der Text daran, verlöre die noch sichtbare Folie
+   ihren Text, während der neue außerhalb des Bildes einblendet. Genau
+   das war der falsche Text auf den Folgebildern.
+
+   Und .ist-dran statt .ist-sichtbar, weil die Klasse zugleich auf der
+   Kopie am anderen Ende der Spur liegt. Beim Umlauf fährt der Text
+   dadurch auf Kopie und Original gleichzeitig ein statt zweimal kurz
+   nacheinander. Dieselbe Überlegung wie beim Bildzoom weiter oben.
+
+   Nur mit JavaScript: ohne JS vergibt niemand die Klasse, dann stünden
+   alle Texte dauerhaft auf opacity 0. Ohne JS steht deshalb alles da.
+
+   Die Einblendung hat 0,14 s Vorlauf. Folien, die beim schnellen
+   Durchblättern nur kurz durchs Bild huschen, fangen damit gar nicht
+   erst an zu erscheinen — kein Flackern. */
+.hat-js .v-hero__innen > .container > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .3s var(--kurve), transform .3s var(--kurve);
+}
+.hat-js .v-hero__folie.ist-dran .v-hero__innen > .container > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .5s var(--kurve) .14s, transform .5s var(--kurve) .14s;
+}
+.hat-js .v-hero__folie.ist-dran .v-hero__innen > .container > *:nth-child(2) { transition-delay: .21s; }
+.hat-js .v-hero__folie.ist-dran .v-hero__innen > .container > *:nth-child(3) { transition-delay: .28s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hat-js .v-hero__innen > .container > * { opacity: 1; transform: none; }
+  .v-hero__bild { transform: none; }
+}
+.v-hero__titel {
+  margin: 0;
+  max-width: 16ch;
+  color: var(--bdp-gelb);          /* ✅ Gelb nur auf dunklem Grund */
+  font-size: clamp(2.5rem, 7.5vw, 6rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -.03em;
+  text-shadow: 0 2px 24px rgba(11, 35, 65, .45);
+}
+.v-hero__text {
+  max-width: 46ch;
+  margin-top: var(--sp-4);
+  color: var(--bdp-weiss);
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  text-shadow: 0 1px 12px rgba(11, 35, 65, .6);
+}
+.v-hero__aktionen { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin-top: var(--sp-8); }
+
+/* Bildnachweis unter Einzelbildern — ✅ Fotograf*innen sind zu nennen.
+   Im Hero steht keiner mehr: dort trägt die Herkunft das Info-Kästchen
+   des jeweiligen Bildes in der Galerie. */
+.v-bild__nachweis {
+  font-size: var(--fs-winzig);
+  color: var(--c-text-leise);
+}
+
+/* Bedienleiste: Pfeil, Punkte, Pfeil — als eine Gruppe unten mittig.
+
+   Vorher hingen die Pfeile auf halber Höhe an den Seitenrändern. Links
+   lagen sie über der Überschrift, rechts mussten sie dem gelben
+   Anschnitt ausweichen und standen dadurch deutlich weiter innen als
+   ihr Gegenstück. Beides fällt weg, sobald die drei Elemente in einer
+   Zeile stehen: Der Abstand zwischen ihnen ist per Konstruktion gleich,
+   und über ihnen ist nichts, was sie verdecken könnten. */
+.v-hero__leiste {
+  position: absolute;
+  left: 50%; bottom: var(--sp-8);
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+/* Slider-Punkte ✅ aktiv weiß, inaktiv gelb */
+.v-hero__punkte {
+  display: flex;
+  gap: var(--sp-3);
+}
+.v-hero__punkt {
+  width: 13px; height: 13px;
+  padding: 0;
+  border: 0; border-radius: 50%;
+  background: var(--bdp-gelb);
+  cursor: pointer;
+  transition: transform var(--zeit-kurz) var(--kurve),
+              background var(--zeit-kurz) var(--kurve);
+}
+.v-hero__punkt[aria-current="true"] { background: var(--bdp-weiss); transform: scale(1.15); }
+.v-hero__punkt:hover { transform: scale(1.25); }
+
+/* Pfeile — Pfadiblau mit Wölflingsgelb, wie der Info-Schalter am Bild.
+   Vorher waren sie weiß auf 16 % Weiß: auf einem hellen Foto praktisch
+   unsichtbar, und der rechte Pfeil lag mitten im gelben Kohtenanschnitt
+   — Weiß auf Gelb, 1,3:1. Man sah die Knöpfe schlicht nicht.
+   Jetzt: Gelb auf Blau = 7,00:1 ✅ AAA, und der rechte Pfeil steht
+   links neben dem Anschnitt, der damit sauber bleibt ✅ */
+.v-hero__pfeil {
+  flex: 0 0 auto;
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  background: var(--bdp-blau);
+  color: var(--bdp-gelb);
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(11, 35, 65, .38);
+  transition: background var(--zeit-kurz) var(--kurve),
+              transform  var(--zeit-kurz) var(--kurve);
+}
+
+/* Der Pfeil ist ein gedrehtes Winkelstück, kein Schriftzeichen.
+
+   Vorher standen dort ‹ und ›. Schriftzeichen sitzen in ihrem
+   Schriftkasten nicht mittig, und wie weit sie danebenliegen, hängt an
+   der Schrift — bei einem Rückfall auf Arial verschiebt sich der
+   Ausgleich mit. Deshalb stand hier eine gemessene Korrektur, die nur
+   für einen Schriftschnitt stimmte.
+
+   Zwei Rahmenkanten haben kein solches Problem: das Winkelstück ist
+   quadratisch, und place-items: center setzt es exakt in die Mitte.
+   Übrig bleibt der halbe Strich, den der Winkel nach der Drehung zur
+   Seite versetzt — das gleicht der Rand von 2 px aus. */
+.v-hero__pfeil > span {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+}
+.v-hero__pfeil--zurueck > span { transform: rotate(135deg); margin-left: 4px; }
+.v-hero__pfeil--vor > span     { transform: rotate(-45deg); margin-right: 4px; }
+
+.v-hero__pfeil:hover {
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  transform: scale(1.08);
+}
+
+/* Auf dem Telefon bleiben die Pfeile stehen. Vorher waren sie dort
+   ausgeblendet, weil sie am Rand keinen Platz hatten; in der Leiste
+   haben sie ihn. Wischen geht weiterhin, aber nicht jeder weiß das,
+   und mit Tastatur wischt man gar nicht ✅ WCAG 2.1.1 */
+@media (max-width: 560px) {
+  .v-hero__leiste { gap: var(--sp-4); }
+  .v-hero__pfeil { width: 44px; height: 44px; }
+}
+
+/* Kleinerer Seitenkopf für Unterseiten. Trägt denselben .v-keil wie der
+   Hero — dieselbe Gerade, dieselbe Logik. */
+.v-seitenkopf {
+  position: relative;
+  z-index: 20;
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  padding-block: var(--sp-16) var(--sp-16);
+}
+.v-seitenkopf__innen { position: relative; z-index: 3; }
+.v-seitenkopf h1 { color: var(--bdp-gelb); margin-bottom: var(--sp-3); }
+.v-seitenkopf .lead { color: rgba(255, 255, 255, .92); }
+.v-seitenkopf--bild { padding-block: var(--sp-24) var(--sp-16); }
+.v-seitenkopf__bild {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: .42;
+}
+
+/* Brotkrumen */
+.v-krumen {
+  font-size: var(--fs-klein);
+  margin-bottom: var(--sp-4);
+  color: rgba(255, 255, 255, .78);
+}
+.v-krumen ol { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; margin: 0; padding: 0; }
+.v-krumen li + li::before { content: "›"; margin-right: var(--sp-2); opacity: .7; }
+.v-krumen a { color: var(--bdp-gelb); text-decoration: none; }
+.v-krumen a:hover { text-decoration: underline; }
+.v-seitenkopf__datum { margin: 0 0 var(--sp-3); }
+
+
+/* ============================================================
+   08 Sektionen, Kacheln, Karten
+   ============================================================ */
+
+.v-sektion { padding-block: clamp(var(--sp-12), 7vw, var(--sp-24)); }
+.v-sektion--eng { padding-block: var(--sp-12); }
+.v-sektion--gedaempft { background: var(--c-bg-gedaempft); }
+.v-sektion--blau {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+}
+.v-sektion--blau h1, .v-sektion--blau h2, .v-sektion--blau h3 { color: var(--bdp-gelb); }
+/* Buttons ausnehmen: sie bringen ihre eigene, geprüfte Paarung mit.
+   Sonst stünde Gelb auf Gelb bzw. Gelb auf Weiß (1,45:1). */
+.v-sektion--blau a:not(.btn) { color: var(--bdp-gelb); }
+.v-sektion--blau .lead { color: rgba(255, 255, 255, .9); }
+/* Die Aktionsknöpfe behalten auch untereinander denselben Abstand. */
+.v-sektion--blau.auf-dunkel .lesebreite > p:has(> .btn + .btn) {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: var(--sp-2);
+}
+@media (max-width: 480px) {
+  .v-sektion--blau.auf-dunkel .lesebreite > p:has(> .btn + .btn) {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+}
+.v-sektion--schraeg { position: relative; }
+
+.v-sektion__kopf { margin-bottom: var(--sp-12); max-width: var(--container-text); }
+.v-sektion__kopf .lead { margin-top: var(--sp-4); }
+
+.v-raster {
+  display: grid;
+  gap: var(--sp-8);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+}
+.v-raster--zwei  { grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+.v-raster--breit { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+
+/* Feste Spaltenzahl, wenn der Kachelblock sie vorgibt. Unterhalb
+   von 620 px gilt sie nicht mehr: Vier Kacheln nebeneinander sind
+   auf einem Telefon vier Streichhölzer. */
+@media (min-width: 620px) {
+  .v-raster--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v-raster--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .v-raster--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 620px) and (max-width: 900px) {
+  /* Vier passen hier noch nicht, zwei schon. */
+  .v-raster--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Eine Kachel ohne Ziel ist kein Link und darf nicht so aussehen. */
+div.v-kachel { cursor: default; }
+
+/* Kachel — Grundbaustein für Gruppen, Aktionen, Beiträge */
+.v-kachel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bdp-weiss);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--schatten-karte);
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--zeit-mittel) var(--kurve),
+              box-shadow var(--zeit-mittel) var(--kurve);
+}
+a.v-kachel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(11, 35, 65, .08), 0 20px 44px rgba(11, 35, 65, .16);
+}
+.v-kachel__bild { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--c-bg-gedaempft); }
+.v-kachel__bild img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform var(--zeit-lang) var(--kurve);
+}
+a.v-kachel:hover .v-kachel__bild img { transform: scale(1.045); }
+.v-kachel__inhalt { padding: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); flex: 1; }
+.v-kachel__titel { font-size: var(--fs-h5); font-weight: 900; color: var(--bdp-blau); margin: 0; }
+.v-kachel__text { color: var(--c-text-leise); font-size: var(--fs-klein); margin: 0; }
+.v-kachel__fuss { margin-top: auto; padding-top: var(--sp-4); }
+
+/* Etikett — z. B. Altersstufe. Nie alleiniger Bedeutungsträger ✅ */
+.v-etikett {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px var(--sp-3);
+  border-radius: 999px;
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  font-size: var(--fs-winzig);
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.v-etikett--blau { background: var(--bdp-blau); color: var(--bdp-weiss); }
+.v-etikett--rot  { background: var(--bdp-rot);  color: var(--bdp-weiss); }
+.v-etikett--linie { background: transparent; border: 2px solid var(--bdp-blau); color: var(--bdp-blau); }
+
+/* --- Berichte (Kachelliste & Startseiten-Vorschau) ----------------
+   Auf /aktionen/berichte liegt der Seitenlisten-Block im Bereich
+   „Main" (.lesebreite, 68 ch). Ein mehrspaltiges Kachel-Raster
+   braucht aber die volle Containerbreite (1200 px), damit zwei bis
+   drei Berichte mit Vorschaubild und Kurzbeschreibung nebeneinander
+   Platz haben. Auf der Startseite steht der neueste Bericht als
+   hervorgehobene Einzelkachel (Bild links, Text rechts). */
+.lesebreite .v-berichte {
+  width: min(var(--container), calc(100vw - 2 * var(--gutter)));
+}
+.v-berichte {
+  margin-top: var(--sp-6);
+}
+.v-berichte--startseite {
+  margin-top: 0;
+}
+.v-raster--berichte {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+}
+.v-kachel--bericht .v-kachel__text {
+  line-height: 1.55;
+}
+.v-start-bericht {
+  margin-bottom: 0;
+}
+.v-start-bericht__kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  max-width: none;
+  margin-bottom: var(--sp-8);
+}
+.v-start-bericht__kopf h2 {
+  margin-bottom: 0;
+}
+.v-raster--bericht-einzeln {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .v-kachel--highlight {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .v-kachel--highlight .v-kachel__bild {
+    flex: 0 0 42%;
+    max-width: 480px;
+    aspect-ratio: auto;
+    min-height: 260px;
+  }
+  .v-kachel--highlight .v-kachel__inhalt {
+    padding: var(--sp-8);
+    justify-content: center;
+  }
+  .v-kachel--highlight .v-kachel__titel {
+    font-size: var(--fs-h4);
+  }
+  .v-kachel--highlight .v-kachel__text {
+    font-size: 1rem;
+    max-width: 62ch;
+  }
+}
+.v-berichte__seite {
+  margin-top: var(--sp-8);
+}
+.v-berichte__leer {
+  color: var(--c-text-leise);
+}
+
+/* Ikon-Kachel — Ikons ✅ nur mit Bezug zu Text */
+.v-ikon { width: 44px; height: 44px; flex-shrink: 0; }
+.v-ikon--gross { width: 68px; height: 68px; }
+
+/* Faktenzeile für Gruppenseiten */
+.v-fakten {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-8);
+  background: var(--c-bg-gedaempft);
+  border-radius: var(--radius);
+  border-left: 6px solid var(--bdp-gelb);
+}
+/* Rasterzellen dürfen schmaler werden als ihr längstes Wort. Ohne das
+   sprengte ein langer Wert (Ansprechperson, Uhrzeitspanne) die Spalte
+   und die ganze Seite ließ sich waagerecht schieben: bei 1200 px
+   Fensterbreite scrollWidth 1287. */
+.v-fakten > div { min-width: 0; }
+.v-fakten dt {
+  font-size: var(--fs-winzig);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--c-text-leise);
+  font-weight: 700;
+}
+.v-fakten dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--bdp-blau);
+  overflow-wrap: anywhere;   /* lange E-Mail-Adressen brechen um, statt herauszuragen */
+}
+
+/* --- Hinweis ------------------------------------------------------
+   Kein Kasten. Die abgerundete graue Karte mit dem farbigen Balken
+   links ist der Standardkeks jedes Baukastens; sie sieht überall
+   gleich aus und sagt nichts über diese Seite.
+
+   Stattdessen die Formsprache, die das Theme ohnehin führt: die
+   gestrichelte CD-Linie oben und unten, dazwischen der Text ohne
+   eigene Fläche, und am Anfang das Sechseck des Stammeslogos in der
+   Akzentfarbe. Keine Rundungen, keine Füllung, kein Rahmen. Der
+   Hinweis liegt damit im Textfluss statt daneben und liest sich wie
+   eine Randnotiz und nicht wie eine Systemmeldung.
+
+   Zwei Farbvariablen statt einer: Gelb trägt als Fläche (Sechseck)
+   und wäre als 2-px-Strich oder als Text auf Weiß unsichtbar
+   (1,45:1). Deshalb übernimmt für Linie und Auszeichnung das dunkle
+   Gelb des CD (5,11:1 ✅ AA). ✅ CD: Gelb nie als Text auf Weiß. */
+.v-hinweis {
+  --hinweis-flaeche: var(--bdp-blau);
+  --hinweis-strich:  var(--bdp-blau);
+
+  position: relative;
+  margin: var(--sp-8) 0;
+  padding: var(--sp-4) 0 var(--sp-4) var(--sp-8);
+  background:
+    repeating-linear-gradient(90deg, var(--hinweis-strich) 0 14px, transparent 14px 24px)
+      0 0 / 100% 2px no-repeat,
+    repeating-linear-gradient(90deg, var(--hinweis-strich) 0 14px, transparent 14px 24px)
+      0 100% / 100% 2px no-repeat;
+}
+
+/* Das Sechseck des Stammeslogos, stehend. Rein dekorativ, deshalb
+   ohne Kontrastanforderung ✅ WCAG 1.4.11 gilt für Bedienelemente. */
+.v-hinweis::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--sp-4) + .3em);
+  width: 17px;
+  height: 19px;
+  background: var(--hinweis-flaeche);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.v-hinweis--gelb {
+  --hinweis-flaeche: var(--bdp-gelb);
+  --hinweis-strich:  var(--bdp-gelb-dunkel);
+}
+.v-hinweis--rot {
+  --hinweis-flaeche: var(--bdp-rot);
+  --hinweis-strich:  var(--bdp-rot);
+}
+
+.v-hinweis > :first-child { margin-top: 0; }
+.v-hinweis > :last-child  { margin-bottom: 0; }
+
+.v-hinweis__titel {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--hinweis-strich);
+}
+
+/* Auf blauem Grund kehren sich die Rollen um: Linie und Auszeichnung
+   in Gelb (7,00:1 ✅), das Sechseck in Weiß. */
+.auf-dunkel .v-hinweis,
+.v-sektion--blau .v-hinweis {
+  --hinweis-flaeche: var(--bdp-weiss);
+  --hinweis-strich:  var(--bdp-gelb);
+}
+
+
+/* ============================================================
+   09 Bild mit Info-Kästchen ⭐
+   ------------------------------------------------------------
+   Jedes Bild kann ein kleines Kästchen mit Hintergrundinfos
+   tragen. Redaktion schreibt nur:
+
+     <figure class="v-bild">
+       <img src="…" alt="…">
+       <figcaption>Beschreibung … <cite>Foto: …</cite></figcaption>
+     </figure>
+
+   theme.js ergänzt Schalter, IDs und ARIA. Ohne JavaScript
+   bleibt die Bildunterschrift sichtbar unter dem Bild stehen —
+   es geht also nichts verloren.
+   ============================================================ */
+
+.v-bild {
+  position: relative;
+  margin: 0 0 var(--sp-8);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--c-bg-gedaempft);
+}
+.v-bild > img { width: 100%; display: block; }
+.v-bild figcaption {
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+  line-height: 1.5;
+}
+.v-bild cite { display: block; font-style: normal; font-size: var(--fs-winzig); opacity: .85; margin-top: 2px; }
+
+/* Die Info-Schalter an den Bildern gab es früher hier: theme.js hat aus
+   jeder .v-bild-Figur ein Bild mit aufklappendem Kästchen gemacht, auf
+   der ganzen Website. Auf Textseiten war das im Weg, gebraucht wird es
+   nur in der Fotogalerie. Deshalb steckt die Mechanik jetzt vollständig
+   im Galerieblock (css/bloecke.css, js/bloecke.js) und nicht mehr im
+   Grundgerüst des Themes.
+
+   Was bleibt, ist die schlichte Bildunterschrift oben — die braucht
+   kein JavaScript und funktioniert überall. */
+
+/* Bild-Varianten */
+.v-bild--breit { margin-inline: calc(var(--sp-8) * -1); }
+.v-bild--rund  { border-radius: var(--radius-gross); }
+.v-bild--hoch > img { aspect-ratio: 3 / 4; object-fit: cover; }
+.v-bild--quer > img { aspect-ratio: 16 / 9; object-fit: cover; }
+
+/* --- Bild neben dem Text ⭐ -----------------------------------------
+   Auf Textseiten darf ein Bild neben den Fließtext rücken, damit die
+   Lesebreite nicht dauernd von Bildern in voller Breite unterbrochen
+   wird. Die Redaktion setzt nur die Klasse:
+
+     <figure class="v-bild v-bild--neben-rechts"> … </figure>
+
+   Das Info-Kästchen aus Abschnitt 09 arbeitet darin unverändert
+   weiter — es liegt absolut im Bild, nicht im Textfluss.
+
+   clear: both auf beiden Varianten ist Absicht: Zwei Bilder kurz
+   hintereinander stellen sich damit untereinander statt sich
+   nebeneinander zu drängen und den Text auf eine Restspalte
+   zusammenzuquetschen.                                          🔶 */
+@media (min-width: 700px) {
+  .v-bild--neben-rechts,
+  .v-bild--neben-links {
+    width: 41%;
+    min-width: 15rem;
+    max-width: 45%;
+    clear: both;
+    margin-block: var(--sp-2) var(--sp-6);
+  }
+  .v-bild--neben-rechts { float: right; margin-left:  var(--sp-8); }
+  .v-bild--neben-links  { float: left;  margin-right: var(--sp-8); }
+
+  /* Ein Bild in voller Breite direkt danach beginnt unter dem Bild. */
+  .v-bild--neben-rechts + .v-bild:not([class*="neben"]),
+  .v-bild--neben-links  + .v-bild:not([class*="neben"]) { clear: both; }
+}
+
+/* Unter 700 px ist neben dem Text kein Platz mehr: volle Breite,
+   untereinander, wie jedes andere Bild auch. */
+@media (max-width: 699px) {
+  .v-bild--neben-rechts,
+  .v-bild--neben-links { float: none; width: auto; max-width: 100%; margin-inline: 0; }
+}
+
+/* Die Lesespalte fasst ihre schwebenden Bilder ein. Ohne das liefe ein
+   hohes Bild am Ende des Textes unten aus der Spalte heraus und legte
+   sich über den nächsten Abschnitt. Die Lesebreite selbst bleibt bei
+   --container-text; das Bild rechnet in Prozent davon. */
+.lesebreite,
+.v-sektion__inhalt,
+.ccm-block-page-list-wrapper { display: flow-root; }
+
+/* Zwei bis drei Bilder nebeneinander */
+.v-bildreihe {
+  display: grid;
+  gap: var(--sp-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  margin-bottom: var(--sp-8);
+}
+.v-bildreihe .v-bild { margin-bottom: 0; height: 100%; }
+.v-bildreihe .v-bild > img { height: 100%; object-fit: cover; aspect-ratio: 4 / 3; }
+
+@media (max-width: 575px) {
+  .v-bild--breit { margin-inline: 0; }
+}
+
+
+/* ============================================================
+   10 Termine · Downloads · Glossar · Galerie · Kämmerei
+   ============================================================ */
+
+/* --- Termine --- */
+.v-termine { list-style: none; margin: 0; padding: 0; }
+.v-termin {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-6);
+  align-items: start;
+  padding: var(--sp-6) 0;
+  border-bottom: 1px solid var(--c-rahmen);
+}
+.v-termin__datum {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-width: 84px;
+  padding: var(--sp-3);
+  border-radius: var(--radius);
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  line-height: 1.05;
+}
+.v-termin__tag   { font-size: 1.75rem; font-weight: 900; }
+.v-termin__monat { font-size: var(--fs-winzig); text-transform: uppercase; letter-spacing: .1em; }
+.v-termin__jahr  { font-size: var(--fs-winzig); opacity: .8; }
+.v-termin__titel { font-size: var(--fs-h5); font-weight: 900; color: var(--bdp-blau); margin: 0 0 var(--sp-1); }
+.v-termin__meta  { font-size: var(--fs-klein); color: var(--c-text-leise); display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+
+.v-filter { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-8); }
+.v-filter__knopf {
+  padding: var(--sp-2) var(--sp-4);
+  border: 2px solid var(--c-rahmen);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bdp-blau);
+  font: inherit;
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--zeit-kurz) var(--kurve),
+              border-color var(--zeit-kurz) var(--kurve);
+}
+.v-filter__knopf:hover { border-color: var(--bdp-blau); }
+.v-filter__knopf[aria-pressed="true"] {
+  background: var(--bdp-blau);
+  border-color: var(--bdp-blau);
+  color: var(--bdp-weiss);
+}
+
+/* --- Downloads --- */
+.v-downloads { list-style: none; margin: 0 0 var(--sp-8); padding: 0; }
+.v-download {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid var(--c-rahmen);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--zeit-kurz) var(--kurve),
+              background var(--zeit-kurz) var(--kurve);
+}
+/* Die Einträge liegen jetzt in <li> und nicht mehr direkt
+   nebeneinander — der Abstand muss deshalb an die Zeile. */
+.v-downloads li + li { margin-top: var(--sp-3); }
+.v-download + .v-download { margin-top: var(--sp-3); }
+.v-download:hover { border-color: var(--bdp-blau); background: var(--c-bg-gedaempft); }
+.v-download__typ {
+  display: grid; place-items: center;
+  min-width: 54px; padding: var(--sp-2) var(--sp-3);
+  border-radius: 6px;
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  font-size: var(--fs-winzig);
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.v-download__text { flex: 1 1 auto; min-width: 0; }
+.v-download__name { display: block; font-weight: 700; color: var(--bdp-blau); }
+.v-download__meta { display: block; font-size: var(--fs-winzig); color: var(--c-text-leise); }
+
+/* Die Größe steht rechts und ist bewusst nüchtern: Sie ist eine
+   Warnung vor einem großen Download, keine Werbung. */
+.v-download__groesse {
+  flex: 0 0 auto;
+  font-size: var(--fs-winzig);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-leise);
+  white-space: nowrap;
+}
+
+/* --- Glossar (Pfadi-Alphabet) --- */
+.v-alphabet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-8);
+  padding: var(--sp-4);
+  background: var(--c-bg-gedaempft);
+  border-radius: var(--radius);
+  position: sticky;
+  top: 100px;
+  z-index: 20;
+}
+
+/* Eine Zeile, so lange es irgend geht: 26 Buchstaben nebeneinander
+   sind mit einem Blick zu erfassen, zwei Reihen muss man erst
+   lesen. Deshalb ist die Breite nicht fest, sondern eine Spanne —
+   Grundmaß 30 px, wachsen bis 40 px. Flexbox verteilt zuerst den
+   freien Platz (also: quadratisch 40 x 40, wo er reicht) und
+   bricht erst um, wenn nicht einmal mehr 30 px je Feld übrig sind.
+   Die Höhe bleibt in jedem Fall 40 px: Die Felder werden schmaler,
+   nicht kleiner, damit die Zeile ruhig und die Zielfläche
+   greifbar bleibt (30 x 40 ✅ WCAG 2.2 AA 2.5.8, min. 24 x 24). */
+.v-alphabet a {
+  display: grid; place-items: center;
+  flex: 1 0 30px;
+  max-width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 900;
+  text-decoration: none;
+  color: var(--bdp-blau);
+  transition: background var(--zeit-kurz) var(--kurve), color var(--zeit-kurz) var(--kurve);
+}
+.v-alphabet a:hover { background: var(--bdp-blau); color: var(--bdp-weiss); }
+.v-alphabet a[aria-disabled="true"] { opacity: .3; pointer-events: none; }
+
+/* Reicht der Platz auch für 30 px nicht mehr, bricht die Leiste um.
+   Zwei oder drei klebende Reihen nehmen beim Scrollen aber genau
+   den Platz weg, den der Text braucht — dann wandert sie lieber
+   ganz mit weg. Die Klasse setzt das Theme-Skript nach dem Messen
+   (siehe theme.js, alphabetleiste). */
+.v-alphabet--umbruch { position: static; }
+
+/* Sprungziel-Ausgleich: Die klebende Leiste steht beim Sprung
+   genau da, wo der angesprungene Buchstabe landet, und verdeckt
+   ihn. html { scroll-padding-top } rechnet nur die Kopfzeile ein,
+   also legt die Überschrift die Höhe der Leiste selbst noch drauf.
+   Den gemessenen Wert setzt theme.js als --alphabet-hoehe; im
+   Umbruch-Fall auf 0, weil dann nichts mehr klebt. Der Vorgabewert
+   4.5rem ist die einzeilige Leiste (40 px Feld + 2 x 1 rem Polster)
+   und trägt den Fall ohne JavaScript. */
+.v-glossar__buchstabe {
+  font-size: var(--fs-h2);
+  color: var(--bdp-gelb);
+  margin-top: var(--sp-12);
+  scroll-margin-top: var(--alphabet-hoehe, 4.5rem);
+  -webkit-text-stroke: 2px var(--bdp-blau);  /* Gelb nie unmaskiert auf Weiß ✅ */
+}
+.v-glossar__eintrag { padding: var(--sp-4) 0; border-bottom: 1px solid var(--c-rahmen); }
+.v-glossar__begriff { font-size: var(--fs-h5); font-weight: 900; color: var(--bdp-blau); margin: 0 0 var(--sp-1); }
+
+.v-suche { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-6); }
+.v-suche input { flex: 1; }
+
+/* --- Galerie --- */
+.v-galerie {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  grid-auto-rows: 220px;
+}
+.v-galerie .v-bild { margin: 0; height: 100%; }
+.v-galerie .v-bild > img { width: 100%; height: 100%; object-fit: cover; }
+.v-galerie .v-bild--gross { grid-column: span 2; grid-row: span 2; }
+@media (max-width: 575px) { .v-galerie .v-bild--gross { grid-column: span 1; grid-row: span 1; } }
+
+/* --- Kämmerei / Artikelliste --- */
+.v-artikel {
+  display: grid;
+  grid-template-columns: 130px 1fr auto;
+  gap: var(--sp-6);
+  align-items: center;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--c-rahmen);
+}
+.v-artikel img { border-radius: 8px; aspect-ratio: 1; object-fit: cover; width: 130px; }
+.v-artikel__name { font-weight: 700; color: var(--bdp-blau); margin: 0 0 var(--sp-1); }
+.v-artikel__text { font-size: var(--fs-klein); color: var(--c-text-leise); margin: 0; }
+.v-artikel__preis { font-size: var(--fs-h4); font-weight: 900; color: var(--bdp-blau); white-space: nowrap; }
+@media (max-width: 575px) {
+  .v-artikel { grid-template-columns: 84px 1fr; }
+  .v-artikel img { width: 84px; }
+  .v-artikel__preis { grid-column: 2; }
+}
+
+
+/* ============================================================
+   11 Formulare
+   ============================================================ */
+
+label, .ccm-form label { display: block; font-weight: 700; color: var(--bdp-blau); margin-bottom: var(--sp-2); }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="url"],
+input[type="number"], input[type="date"], input[type="search"], input[type="password"],
+select, textarea, .ccm-form .form-control {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  font: inherit;
+  font-size: 1rem;
+  color: var(--c-text);
+  background: var(--bdp-weiss);
+  border: 2px solid var(--c-rahmen);
+  border-radius: var(--radius);
+  transition: border-color var(--zeit-kurz) var(--kurve),
+              box-shadow var(--zeit-kurz) var(--kurve);
+}
+input:hover, select:hover, textarea:hover { border-color: #8FA3B8; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--bdp-blau);
+  box-shadow: 0 0 0 4px rgba(14, 66, 120, .14);
+  outline: none;
+}
+textarea { min-height: 9rem; resize: vertical; }
+
+.v-formfeld { margin-bottom: var(--sp-6); }
+.v-formfeld__hilfe { font-size: var(--fs-klein); color: var(--c-text-leise); margin-top: var(--sp-2); }
+.v-formfeld--pflicht > label::after { content: " *"; color: var(--bdp-rot); }
+
+/* Fehler nie nur über Farbe transportieren ✅ */
+.v-fehler {
+  display: flex; gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  color: var(--bdp-rot-dunkel);
+  font-size: var(--fs-klein);
+  font-weight: 700;
+}
+.v-fehler::before { content: "▲"; }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--bdp-rot); }
+
+
+/* ============================================================
+   12 Einbettungen mit Consent
+   ------------------------------------------------------------
+   Karte, Video und externe Formulare laden erst nach aktiver
+   Zustimmung. Der Altseite fehlte das komplett.
+   ============================================================ */
+
+.v-einbettung {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--c-bg-gedaempft);
+  border: 2px dashed var(--c-rahmen);
+  margin-bottom: var(--sp-8);
+}
+/* Kompakt: Der Platzhalter ist kein Aufklärungsblatt, sondern der
+   Weg zur Karte. Keine 320 px hohe Textfläche mehr, sondern so
+   hoch, wie zwei Knöpfe und eine Zeile brauchen. */
+.v-einbettung__platzhalter {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--sp-3);
+  min-height: 0;
+  padding: var(--sp-6);
+  text-align: center;
+}
+.v-einbettung__titel { font-weight: 900; color: var(--bdp-blau); font-size: var(--fs-h4); margin: 0; }
+.v-einbettung__text { max-width: 52ch; color: var(--c-text-leise); font-size: var(--fs-klein); margin: 0; }
+.v-einbettung iframe { display: block; width: 100%; min-height: 420px; border: 0; }
+.v-einbettung.ist-geladen { border-style: solid; border-color: transparent; }
+.v-einbettung.ist-geladen .v-einbettung__platzhalter { display: none; }
+
+/* Der Kartenblock bringt seine Höhe selbst mit. */
+.v-karte iframe { min-height: var(--v-karte-hoehe, 420px); }
+
+.v-karte__anschrift {
+  font-style: normal;
+  line-height: var(--lh-body);
+  color: var(--c-text);
+}
+
+.v-einbettung__knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin: 0;
+}
+
+/* Der Weg zu Google steht neben und nicht unter dem Ladeknopf: Wer
+   die Karte nicht einbetten lassen will, soll nicht erst suchen. */
+.v-einbettung__neu {
+  font-size: var(--fs-winzig);
+  font-weight: 400;
+  opacity: .8;
+}
+
+.v-einbettung__hinweis {
+  margin: 0;
+  font-size: var(--fs-winzig);
+  color: var(--c-text-leise);
+}
+
+.v-einbettung__leer {
+  padding: var(--sp-4);
+  border: 2px dashed var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+
+
+/* ------------------------------------------------------------
+   12b Widerruf auf der Datenschutzseite
+   ------------------------------------------------------------
+   Eine Einwilligung muss so leicht zurückzunehmen sein, wie sie
+   zu geben war (Art. 7 Abs. 3 DSGVO) — also ein Knopf und kein
+   Absatz, der erklärt, wie man den Browserspeicher leert.
+   ------------------------------------------------------------ */
+
+.v-einwilligung {
+  margin: var(--sp-8) 0;
+  padding: var(--sp-6);
+  border: 2px solid var(--c-rahmen);
+  border-radius: var(--radius);
+  background: var(--c-bg-gedaempft);
+}
+.v-einwilligung__titel { margin: 0 0 var(--sp-2); font-size: var(--fs-h4); }
+.v-einwilligung__text  { margin: 0 0 var(--sp-4); color: var(--c-text-leise); }
+
+.v-einwilligung__liste { margin: 0; padding: 0; list-style: none; }
+
+.v-einwilligung__zeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-top: 2px solid var(--c-rahmen);
+}
+
+/* Der Zustand steht als Wort da und nicht nur als Farbe — Rot und
+   Grün allein unterscheidet nicht jeder ✅ WCAG 1.4.1 */
+.v-einwilligung__stand {
+  font-size: var(--fs-klein);
+  font-weight: 700;
+}
+.v-einwilligung__stand[data-erteilt="ja"]   { color: var(--bdp-waldgruen); }
+.v-einwilligung__stand[data-erteilt="nein"] { color: var(--c-text-leise); }
+
+.v-einwilligung__erklaerung {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+  max-width: 52ch;
+}
+
+.v-einwilligung__meldung {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-klein);
+  color: var(--bdp-waldgruen);
+}
+.v-einwilligung__meldung:empty { margin: 0; }
+
+
+/* ============================================================
+   13 Fußbereich — ein flacher blauer Balken
+   ------------------------------------------------------------
+   Kompakt, schlicht, dicht. Eine Reihe aus Marken, Anschrift und
+   Kontaktwegen, darunter die gestrichelte CD-Linie und die
+   Schlusszeile. Darüber die leichte Schräge.
+
+   Drei Entscheidungen tragen die Kompaktheit:
+
+   1. Die Schräge ist auf 2vw geschrumpft (--fuss-diagonale). Sie
+      kostet ihre Höhe zweimal, weil der obere Innenabstand sie
+      ausgleichen muss, sonst läge Text im Anschnitt.
+   2. Die Überschriften über den Blöcken sind weg. „Wo du uns
+      findest“ über einer Anschrift trug nichts bei und kostete je
+      rund 32 px. Die Blöcke tragen stattdessen ein aria-label.
+   3. Die Kontaktwege liegen nebeneinander statt untereinander.
+      Drei Zeilen zu 44 px gaben allein 132 px vor; nebeneinander
+      ist es eine Zeile, und die Reihe wird so hoch wie ihr
+      höchster Block statt wie die Summe.
+
+   Gemessene Höhe des Balkens: 393 px vorher, 175 px jetzt (1440 px).
+
+   Farben auf Pfadiblau:
+     Weiß   10,15:1  Fließtext
+     Gelb    7,00:1  Links und Auszeichnungen ✅ hier darf Gelb Text sein
+   ============================================================ */
+
+/* Luft zwischen Inhalt und Fußbereich, mitwachsend 🔶 */
+.v-fuss { margin-top: clamp(var(--sp-12), 6vw, 5.5rem); }
+
+.v-fuss__balken {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  padding-block: calc(var(--fuss-diagonale) + var(--sp-6)) var(--sp-6);
+  /* Ein Anschnitt, am Rand ✅ Die Oberkante läuft von links oben nach
+     rechts unten, dieselbe Richtung wie in der Vorlage. */
+  clip-path: polygon(0 0, 100% var(--fuss-diagonale), 100% 100%, 0 100%);
+}
+
+/* Die Reihe in drei Stufen.
+
+   Unter 620 px gestapelt. Dazwischen stehen Marken und Anschrift
+   nebeneinander, die Kontaktwege darunter über die volle Breite —
+   sie sind der breiteste Block und würden in einer eigenen Spalte
+   die Anschrift auf Streichholzbreite quetschen. Ab 1000 px passt
+   alles in eine Zeile; darunter reicht der Platz nicht, dann bräche
+   die Kontaktzeile um und die Reihe würde wieder höher.
+
+   Die letzte Spalte ist die redaktionelle Fläche; sie nimmt den
+   Rest und fällt leer auf null zusammen. */
+.v-fuss__raster {
+  display: grid;
+  gap: var(--sp-4) var(--sp-8);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 620px) {
+  .v-fuss__raster { grid-template-columns: auto minmax(0, 1fr); }
+  .v-fuss__raster > .v-sozial { grid-column: 1 / -1; }
+}
+@media (min-width: 1000px) {
+  .v-fuss__raster { grid-template-columns: auto auto auto minmax(0, 1fr); }
+  .v-fuss__raster > .v-sozial { grid-column: auto; }
+  /* Die Spalten standen hier mit feinen senkrechten Trennstrichen.
+     Der Abstand allein gliedert die Reihe schon; die Striche machten
+     sie unruhiger, nicht klarer. Der Innenabstand bleibt, er hält den
+     Abstand zwischen den Spalten. */
+  .v-fuss__raster > .v-adresse,
+  .v-fuss__raster > .v-sozial {
+    padding-left: var(--sp-8);
+  }
+}
+
+/* --- Die beiden Marken ------------------------------------------
+   Auf dunklem Grund die gelbe Variante der Wortbildmarke ✅ CD.
+   Der Abstand zwischen ihnen ist der Schutzraum: 28 % der Höhe
+   des Stammeslogos ✅ */
+.v-fuss__marken {
+  display: flex;
+  align-items: center;
+  gap: calc(38px * .28);
+  flex-wrap: wrap;
+  margin: 0;
+}
+.v-fuss__marke {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: opacity var(--zeit-kurz) var(--kurve);
+}
+.v-fuss__marke:hover { opacity: .82; }
+.v-fuss__marke-stamm { height: 38px; width: auto; }
+.v-fuss__marke-bdp   { height: 24px; width: auto; }
+
+/* --- Adresse -----------------------------------------------------
+   Steht auch auf weißen Seiten (Kontakt, Impressum, Datenschutz).
+   Die Grundfarben gelten deshalb für Weiß; die hellen Varianten
+   setzt erst .auf-dunkel. Vorher galt Weiß auf Weiß global — die
+   Anschrift im Impressum war unsichtbar. */
+.v-adresse {
+  font-style: normal;
+  color: var(--c-text);
+  font-size: var(--fs-klein);
+  line-height: 1.55;
+}
+.v-adresse strong { display: block; font-weight: 700; color: var(--bdp-blau); }
+.v-adresse a { color: var(--bdp-blau); text-decoration: underline; }
+
+.auf-dunkel .v-adresse { color: var(--bdp-weiss); }
+.auf-dunkel .v-adresse strong { color: var(--bdp-gelb); }   /* 7,00:1 ✅ */
+.auf-dunkel .v-adresse a { color: var(--bdp-gelb); text-decoration: none; }
+.auf-dunkel .v-adresse a:hover { text-decoration: underline; }
+
+/* --- Kontaktwege -------------------------------------------------
+   Nebeneinander statt untereinander, siehe Punkt 3 oben. Der blaue
+   Rahmen von früher wäre auf Blau unsichtbar; stattdessen steht das
+   Symbol frei in Gelb, die Beschriftung daneben in Weiß. */
+.v-sozial {
+  list-style: none; margin: 0; padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-6);
+}
+.v-sozial a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 38px;              /* Zielfläche ✅ WCAG 2.5.8 (24 px) */
+  font-size: var(--fs-klein);
+  color: var(--bdp-weiss);
+  text-decoration: none;
+}
+.v-sozial__ikon {
+  display: grid;
+  place-items: center;
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+}
+.v-sozial__ikon svg {
+  width: 19px; height: 19px;
+  fill: var(--bdp-gelb);
+  transition: transform var(--zeit-kurz) var(--kurve);
+}
+/* Beim Überfahren bekommt die Beschriftung die gestrichelte CD-Linie,
+   dieselbe Form wie in der Navigation ✅ */
+.v-sozial__text {
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 12px, transparent 12px 20px);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  padding-bottom: 3px;
+  transition: background-size var(--zeit-mittel) var(--kurve);
+}
+.v-sozial a:hover .v-sozial__text,
+.v-sozial a:focus-visible .v-sozial__text { background-size: 100% 2px; }
+.v-sozial a:hover .v-sozial__ikon svg { transform: scale(1.12); }
+
+/* --- Schlusszeile ------------------------------------------------
+   Getrennt durch die gestrichelte Linie des CD, waagerecht ✅
+   Links die Pflichtangaben, rechts der Träger. */
+.v-fuss__schluss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--sp-8);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 16px, transparent 16px 26px);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 2px;
+}
+
+.v-rechtslinks {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-6);
+}
+/* Gelb auf Blau = 7,00:1 ✅ AAA — hier darf Gelb Textfarbe sein.
+   Der senkrechte Innenabstand hält die Zielfläche über 24 px ✅
+
+   Ohne die gestrichelte Unterlinie: Drei kurze Links nebeneinander,
+   jeder mit eigener Strichelung darunter, waren mehr Muster als Text.
+   Erkennbar bleiben sie an Farbe UND Fettung — Farbe allein dürfte
+   den Link nicht ausmachen ✅ WCAG 1.4.1. Beim Überfahren kommt der
+   Unterstrich dazu. */
+.v-rechtslinks a {
+  display: inline-block;
+  color: var(--bdp-gelb);
+  font-weight: 700;
+  font-size: var(--fs-winzig);
+  text-decoration: none;
+  padding-block: var(--sp-2);
+  transition: color var(--zeit-kurz) var(--kurve);
+}
+.v-rechtslinks a:hover,
+.v-rechtslinks a:focus-visible {
+  color: var(--bdp-gelb-hell);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.v-fuss__hinweis {
+  font-size: var(--fs-winzig);
+  color: rgba(255, 255, 255, .78);
+  margin: 0;
+}
+.v-fuss__hinweis a { color: var(--bdp-gelb); }
+
+/* Auf schmalen Schirmen untereinander statt nebeneinander */
+@media (max-width: 700px) {
+  .v-fuss__schluss { flex-direction: column; align-items: flex-start; }
+  .v-fuss__hinweis { padding-top: var(--sp-1); }
+}
+
+
+/* ============================================================
+   14 Concrete-Anpassungen, Bewegung, Druck
+   ============================================================ */
+
+/* Bearbeitungsmodus: Bereiche sichtbar halten, Diagonalen nicht stören */
+.ccm-toolbar-visible .v-kopf { position: static; }
+.ccm-page.ccm-edit-mode .keil,
+.ccm-page.ccm-edit-mode .v-hero__keil { pointer-events: none; }
+.ccm-area-drop-target-inner { min-height: 3rem; }
+
+/* Systemseiten (Login, Registrierung, Suche, Fehlerseiten) bringen ihre
+   eigene Überschrift mit. Die steht aber schon im blauen Seitenkopf —
+   die zweite wird deshalb ausgeblendet, bleibt aber im Quelltext. */
+.v-systeminhalt > h1:first-child { display: none; }
+
+/* Concrete-Blocklisten (Page List, Gallery) an die Kacheln angleichen */
+.ccm-block-page-list-page-entry-thumbnail img { border-radius: var(--radius); }
+
+/* Bewegungsarme Darstellung ✅ WCAG 2.3.3 */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  a.v-kachel:hover { transform: none; }
+  a.v-kachel:hover .v-kachel__bild img { transform: none; }
+}
+
+/* Sanftes Einblenden beim Scrollen — nur einmal, und nur wenn
+   JavaScript läuft. Ohne JS fehlt .hat-js und alles steht sofort da;
+   so kann die Animation Inhalte nie verschlucken. */
+.hat-js .v-auftritt {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--zeit-lang) var(--kurve),
+              transform var(--zeit-lang) var(--kurve);
+}
+.hat-js .v-auftritt.ist-sichtbar { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .hat-js .v-auftritt { opacity: 1; transform: none; }
+}
+
+/* ------------------------------------------------------------------
+   Hinweisstreifen für angemeldete Redakteure
+
+   Ganz oben, über der Topbar, in R*R-Rot: Er soll nicht wie ein Teil
+   der Website aussehen, sondern wie etwas, das nur für Eingeloggte da
+   ist. Weiß auf Rot = 8,35:1 ✅ AAA. Steht für Besucher gar nicht erst
+   im HTML.
+   ------------------------------------------------------------------ */
+.v-redaktionshinweis {
+  background: var(--bdp-rot);
+  color: var(--bdp-weiss);
+  font-size: var(--fs-winzig);
+  line-height: 1.5;
+}
+.v-redaktionshinweis p {
+  margin: 0;
+  padding: var(--sp-2) 0;
+}
+.v-redaktionshinweis a {
+  color: var(--bdp-gelb);           /* 5,86:1 auf Rot ✅ AA */
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Bearbeitungsmodus
+
+   Was hier passiert, ist ausschließlich eine Frage der Bedienbarkeit:
+   Bereiche müssen anfassbar sein, auch wenn sie leer sind, und nichts
+   darf sich bewegen, während man Blöcke setzt.
+   ------------------------------------------------------------------ */
+
+/* Einblendungen bleiben aus. Das erledigt auch theme.js, aber die
+   Startwerte stehen im CSS — ohne diese Regel wären die Elemente bis
+   zum Laden des Skripts unsichtbar. */
+[data-editmodus] .v-auftritt {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Leere Bereiche brauchen eine Fläche, auf die man ziehen kann. */
+[data-editmodus] .ccm-area-drop-target-inner { min-height: 4rem; }
+
+/* Die diagonalen Anschnitte fangen sonst Klicks ab, die dem Block
+   darunter gelten. */
+[data-editmodus] .keil,
+[data-editmodus] .v-keil,
+[data-editmodus] .v-hero__keil { pointer-events: none; }
+
+/* Der gelbe Kopf-Anschnitt bleibt in der Redaktionsansicht weg.
+   Er ist auf einen Kopf gerechnet, der oben klebt; angemeldet steht
+   der Kopf still (siehe unten), darüber liegen Concrete-Leiste und
+   Hinweisstreifen, und der Keil ragt in beides hinein. Er schmückt
+   nur — beim Redigieren fehlt er niemandem, und der Besucher
+   bekommt ihn unverändert. */
+[data-angemeldet] .v-keil { display: none; }
+
+/* Der Kopf klebt normalerweise oben. Unter der Concrete-Leiste
+   überdeckt er die obersten Blöcke — und mit dem ausgeklappten
+   Seitenbaum darin wäre er ohnehin zu hoch zum Mitscrollen. */
+[data-angemeldet] .v-kopf { position: static; }
+
+@media print {
+  .v-redaktionshinweis { display: none !important; }
+  .v-topbar, .v-kopf, .v-fuss__balken, .v-burger,
+  .v-galerie__info, .v-hero__punkte, .v-hero__pfeil { display: none !important; }
+  body { font-size: 11pt; color: #000; }
+  /* Auf Papier gibt es kein Aufklappen: die Bildinformationen der
+     Galerie stehen einfach unter dem Bild. */
+  .v-galerie__stueck figcaption {
+    position: static; opacity: 1; visibility: visible; transform: none;
+    max-height: none; box-shadow: none; background: none; color: #000;
+  }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; }
+}

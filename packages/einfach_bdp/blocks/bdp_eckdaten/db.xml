@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPEckdaten">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Liste der Zeilen als JSON: bezeichnung, wert -->
+        <field name="zeilen" type="X2"/>
+        <!-- auto | woelflinge | pfadfinder | ranger | alle -->
+        <field name="stufe" type="C" size="20">
+            <DEFAULT value="auto"/>
+        </field>
+    </table>
+</schema>

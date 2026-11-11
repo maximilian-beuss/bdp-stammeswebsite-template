@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPEinwilligung">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Überschrift über dem Kasten -->
+        <field name="ueberschrift" type="C" size="255">
+            <DEFAULT value="Deine Einwilligungen"/>
+        </field>
+        <!-- Erklärender Text darunter -->
+        <field name="text" type="X"/>
+    </table>
+</schema>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPSeitenkopf">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Darf Platzhalter enthalten, siehe \EinfachBdP\Platzhalter -->
+        <field name="titel" type="C" size="255">
+            <DEFAULT value="{Titel}"/>
+        </field>
+        <field name="untertitel" type="X2"/>
+        <field name="krumen" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="bildfID" type="I" size="10">
+            <UNSIGNED/>
+            <DEFAULT value="0"/>
+        </field>
+        <!-- blau | bild | hell -->
+        <field name="stil" type="C" size="16">
+            <DEFAULT value="blau"/>
+        </field>
+    </table>
+</schema>

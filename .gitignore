@@ -1,0 +1,51 @@
+# ============================================================
+# .gitignore — BdP Stammeswebsite Template / Concrete CMS 9
+# ============================================================
+
+# --- Secrets und lokale Konfiguration -----------------------
+application/config/database.php
+application/config/.APP_LOCAL.php
+application/config/production.*.php
+application/config/local.*.php
+application/config/staging.*.php
+.env
+.env.*
+
+# --- Hochgeladene Inhalte (Redaktionsuploads) ---------------
+# Werden separat gesichert, nicht per Git verwaltet.
+application/files/*
+!application/files/.gitkeep
+
+# --- Vom CMS generierter Zustand ----------------------------
+application/config/generated_overrides/
+application/config/doctrine/
+application/bootstrap/cache.php
+
+# --- Caches, Logs, Temporäres --------------------------------
+application/files/cache/
+application/files/tmp/
+*.log
+error_log
+.phpunit.result.cache
+.phpunit.cache/
+
+# --- Werkzeugkram --------------------------------------------
+node_modules/
+package-lock.json
+yarn.lock
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.orig
+
+# --- Lokal / Docker -----------------------------------------
+/archive/
+backups/dumps/
+backups/zips/
+backups/*.sql

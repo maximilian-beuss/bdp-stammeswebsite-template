@@ -1,0 +1,63 @@
+# ============================================================
+# .htaccess — Stamm der Vaganten / Concrete CMS 9
+# ============================================================
+# Diese Datei muss auf XAMPP (Unterordner /vaganten/) UND auf
+# netcup (Dokumentwurzel /) unverändert funktionieren, weil sie im
+# Git-Repo liegt und bei jedem Deploy überschrieben wird.
+#
+# Deshalb steht hier bewusst KEIN RewriteBase: ohne die Direktive
+# löst Apache das Ziel `index.php` relativ zu dem Verzeichnis auf,
+# in dem die .htaccess liegt. Getestet unter /vaganten/ und unter /.
+# Wer hier ein RewriteBase einträgt, bindet die Datei an genau eine
+# Umgebung und bricht die jeweils andere.
+# ============================================================
+
+
+# --- MIME-Typen ---------------------------------------------
+# Untertitel. Ohne text/vtt liefert Apache die Datei ohne Typ aus, und
+# der Browser hängt die Spur stillschweigend gar nicht erst ein — der
+# Knopf für Untertitel bleibt dann leer, ohne Fehlermeldung.
+<IfModule mod_mime.c>
+    AddType text/vtt .vtt
+    AddType video/mp4 .mp4 .m4v
+    AddType video/webm .webm
+</IfModule>
+
+
+# --- Zugriffsschutz -----------------------------------------
+# Alles, was im Dokumentbaum liegt, aber niemand aus dem Netz sehen
+# darf. Die Rewrite-Regel unten reicht dafür NICHT: sie leitet nur
+# um, was es nicht als Datei gibt (`!-f`) — existierende Dateien
+# liefert Apache ungefragt aus.
+
+# Versteckte Verzeichnisse und Dateien (.git, .env, .gitignore …).
+# Auf netcup wird das Repo direkt in die Dokumentwurzel geklont;
+# ohne diese Sperre liegt /.git/config öffentlich im Netz.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)\.(?!well-known(/|$)) - [F,L]
+</IfModule>
+
+# Datenbank-Dumps, Archive, Logs und Composer-Metadaten.
+<FilesMatch "\.(sql|sql\.gz|zip|tar|tar\.gz|tgz|log|bak|orig|tmp|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+
+# --- Concrete CMS — sprechende URLs -------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Bearer-Token für die Mailinglisten-REST-API auch unter Apache/FastCGI
+    # an PHP weiterreichen; manche Hosting-Konfigurationen entfernen den
+    # Authorization-Header sonst vor dem Anwendungscode.
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>

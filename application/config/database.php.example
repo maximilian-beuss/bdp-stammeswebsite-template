@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * Datenbank-Verbindung für einfachBdP.
+ *
+ * Diese Datei ist die VORLAGE. Sie wird mit `database.php` symlinkt oder
+ * bei der Installation kopiert. Echte Credentials gehören NIE ins Repo.
+ *
+ * Anpassen für den eigenen Server:
+ *   'server'   => 'localhost',
+ *   'database' => 'mein_stamm',
+ *   'username' => 'mein_user',
+ *   'password' => '…aus dem Hostingpanel…',
+ */
+
+return [
+    'default-connection' => 'concrete',
+    'connections' => [
+        'concrete' => [
+            'driver' => 'concrete_pdo_mysql',
+            'server' => '127.0.0.1',
+            'database' => 'mein_stamm',
+            'username' => 'root',
+            'password' => '',
+            'character_set' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+        ],
+    ],
+];

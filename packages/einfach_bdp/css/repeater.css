@@ -1,0 +1,109 @@
+/* =============================================================
+   Wiederholfelder in den Blockmasken + Dashboard-Seiten
+   -------------------------------------------------------------
+   Farben über CSS custom properties mit light-dark() — reagiert
+   automatisch auf das Hell/Dunkel-Schema des Browsers/Dashboards.
+   ============================================================= */
+
+:root {
+    --rep-bg:         light-dark(#fff,        #2a2d31);
+    --rep-bg-kopf:    light-dark(#f3f5f7,     #1e2124);
+    --rep-border:     light-dark(#d3d9e0,     #3d4248);
+    --rep-border-sub: light-dark(#e3e7eb,     #343a40);
+    --rep-border-leer:light-dark(#adb5bd,     #4a5260);
+    --rep-text-muted: light-dark(#55595b,     #9aa0aa);
+    --rep-bg-bild:    light-dark(#fafbfc,     #1a1d20);
+}
+
+.v-rep__zeile {
+    border: 1px solid var(--rep-border);
+    border-radius: 4px;
+    background: var(--rep-bg);
+    margin-bottom: 10px;
+}
+
+.v-rep__kopf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--rep-bg-kopf);
+    border-bottom: 1px solid var(--rep-border-sub);
+    border-radius: 4px 4px 0 0;
+}
+
+.v-rep__titel {
+    font-weight: 600;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    text-align: left;
+    padding: 0;
+}
+
+.v-rep__werkzeug {
+    display: flex;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.v-rep__werkzeug .btn {
+    padding: 2px 8px;
+    line-height: 1.4;
+}
+
+.v-rep__koerper {
+    padding: 12px;
+}
+
+.v-rep__zeile.ist-zu .v-rep__koerper {
+    display: none;
+}
+
+/* Zwei Spalten, sobald Platz ist. Bild links, Texte rechts. */
+.v-rep__paar {
+    display: grid;
+    gap: 12px;
+}
+
+@media (min-width: 700px) {
+    .v-rep__paar {
+        grid-template-columns: 200px 1fr;
+    }
+}
+
+.v-rep__bild {
+    display: block;
+    width: 100%;
+    min-height: 96px;
+    border: 1px dashed var(--rep-border-leer);
+    border-radius: 4px;
+    background: var(--rep-bg-bild);
+    color: var(--rep-text-muted);
+    padding: 8px;
+}
+
+.v-rep__bild img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.v-rep__leer {
+    padding: 14px;
+    border: 1px dashed var(--rep-border-leer);
+    border-radius: 4px;
+    color: var(--rep-text-muted);
+    text-align: center;
+}
+
+/* Die Platzhaltertabelle in den Masken */
+.v-rep__hilfe code {
+    white-space: nowrap;
+}

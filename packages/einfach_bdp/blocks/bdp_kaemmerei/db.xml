@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPKaemmerei">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Liste der Artikel als JSON -->
+        <field name="artikel" type="X2"/>
+        <!-- Nach Rubrik gruppieren und Zwischenüberschriften setzen -->
+        <field name="gruppieren" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <!-- Adresse für den Bestellknopf an jedem Artikel -->
+        <field name="bestellMail" type="C" size="160">
+            <DEFAULT value="kaemmerei@musterstamm.de"/>
+        </field>
+    </table>
+</schema>

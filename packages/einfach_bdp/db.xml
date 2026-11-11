@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+
+    <!--
+        Termine des Stammeskalenders.
+
+        Eigene Tabelle statt JSON im Block, weil drei Stellen darauf
+        zugreifen: der Kalenderblock, die iCal-Ausgabe und die
+        Dashboard-Maske. Außerdem muss nach Datum sortiert und auf
+        Zeiträume eingeschränkt werden.
+
+        beginn/ende sind DATETIME. Bei ganztägigen Terminen steht in
+        beginn 00:00 und in ende 23:59 des letzten Tages; das Flag
+        ganztaegig entscheidet über die Darstellung und über die
+        Schreibweise in der iCal-Datei (DATE statt DATE-TIME).
+    -->
+    <table name="BdPTermine">
+        <field name="terminID" type="I" size="10">
+            <KEY/>
+            <UNSIGNED/>
+            <AUTOINCREMENT/>
+        </field>
+        <field name="titel" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <field name="beginn" type="T">
+            <NOTNULL/>
+        </field>
+        <field name="ende" type="T">
+            <NOTNULL/>
+        </field>
+        <field name="ganztaegig" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="stufe" type="C" size="32">
+            <DEFAULT value="alle"/>
+        </field>
+        <field name="ort" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <field name="beschreibung" type="X2"/>
+        <field name="link" type="C" size="512">
+            <DEFAULT value=""/>
+        </field>
+        <field name="uid" type="C" size="80">
+            <DEFAULT value=""/>
+        </field>
+        <field name="geaendert" type="T"/>
+        <!--
+            Entwurf: liegt im Jahresplan, ist aber noch nicht
+            veröffentlicht. Erscheint weder im öffentlichen Kalender
+            noch im iCal-Abo — sonst bekämen Abonnenten jede
+            Planungsidee als Termin in ihren Kalender geschoben und
+            gleich darauf wieder gelöscht.
+        -->
+        <field name="entwurf" type="I" size="1">
+            <DEFAULT value="0"/>
+        </field>
+        <index name="idx_beginn">
+            <col>beginn</col>
+        </index>
+        <index name="idx_stufe">
+            <col>stufe</col>
+        </index>
+    </table>
+
+    <!--
+        Schulferien und Feiertage. Getrennt von den Terminen, weil sie
+        nicht redaktionell gepflegt, sondern jahrgangsweise eingespielt
+        werden, keine Kategorie tragen und nie im iCal-Abo landen.
+    -->
+    <table name="BdPKalenderfrei">
+        <field name="freiID" type="I" size="10">
+            <KEY/>
+            <UNSIGNED/>
+            <AUTOINCREMENT/>
+        </field>
+        <field name="titel" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <field name="beginn" type="D">
+            <NOTNULL/>
+        </field>
+        <field name="ende" type="D">
+            <NOTNULL/>
+        </field>
+        <!-- feiertag | ferien -->
+        <field name="art" type="C" size="16">
+            <DEFAULT value="feiertag"/>
+        </field>
+        <index name="idx_frei_beginn">
+            <col>beginn</col>
+        </index>
+        <!-- Woher der Eintrag kommt: api | gerechnet | hand -->
+        <field name="quelle" type="C" size="16">
+            <DEFAULT value="hand"/>
+        </field>
+        <field name="land" type="C" size="40">
+            <DEFAULT value=""/>
+        </field>
+    </table>
+
+    <!--
+        Protokoll der Abrufe bei mehr-schulferien.de.
+
+        Das ist der Cache-Schlüssel: Für ein Bundesland und ein Jahr
+        wird höchstens alle paar Tage einmal angefragt. Ohne dieses
+        Protokoll gäbe es keinen Weg zu erkennen, ob ein Jahr ohne
+        Ferien wirklich leer ist oder nur noch nie abgefragt wurde —
+        und jeder Aufruf ginge erneut ins Netz.
+    -->
+    <table name="BdPFerienabruf">
+        <field name="abrufID" type="I" size="10">
+            <KEY/>
+            <UNSIGNED/>
+            <AUTOINCREMENT/>
+        </field>
+        <field name="land" type="C" size="40">
+            <NOTNULL/>
+        </field>
+        <field name="jahr" type="I" size="4">
+            <NOTNULL/>
+        </field>
+        <field name="geholt" type="T">
+            <NOTNULL/>
+        </field>
+        <field name="anzahl" type="I" size="6">
+            <DEFAULT value="0"/>
+        </field>
+        <!-- leer = hat geklappt -->
+        <field name="fehler" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <index name="idx_land_jahr">
+            <col>land</col>
+            <col>jahr</col>
+            <UNIQUE/>
+        </index>
+    </table>
+
+    <!--
+        Der Ideenspeicher der Jahresplanung.
+
+        Hier stehen Vorhaben, die es geben soll, für die aber noch kein
+        Datum feststeht — nur Titel, Dauer und Stufe. Aus dem Speicher
+        zieht man sie ins Jahr; dabei wird aus der Idee ein Termin im
+        Entwurfszustand, und die Idee verschwindet. Zurückziehen macht
+        daraus wieder eine Idee.
+
+        Eigene Tabelle statt eines Termins ohne Datum: Ein Termin ohne
+        Datum müsste in jeder Abfrage gesondert behandelt werden, und
+        beginn wäre nicht mehr NOT NULL. Eine Idee ist auch fachlich
+        etwas anderes als ein Termin — sie hat eine Dauer, aber keine
+        Lage im Jahr.
+    -->
+    <table name="BdPPlanungsideen">
+        <field name="ideeID" type="I" size="10">
+            <KEY/>
+            <UNSIGNED/>
+            <AUTOINCREMENT/>
+        </field>
+        <field name="titel" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <field name="tage" type="I" size="4">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="stufe" type="C" size="32">
+            <DEFAULT value="alle"/>
+        </field>
+        <field name="notiz" type="X2"/>
+        <field name="sortierung" type="I" size="6">
+            <DEFAULT value="0"/>
+        </field>
+        <field name="angelegt" type="T"/>
+    </table>
+
+</schema>

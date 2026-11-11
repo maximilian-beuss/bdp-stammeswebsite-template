@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPKarte">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Adresse des iframes beim Kartendienst -->
+        <field name="einbettung" type="X"/>
+        <!-- Name des Dienstes für den Hinweistext, z. B. Google Maps -->
+        <field name="dienst" type="C" size="80">
+            <DEFAULT value="Google Maps"/>
+        </field>
+        <!-- Beschriftung des Rahmens für Screenreader -->
+        <field name="titel" type="C" size="255"/>
+        <!-- Anschrift im Platzhalter, damit die Seite ohne Karte brauchbar bleibt -->
+        <field name="anschrift" type="X"/>
+        <!-- Verweis zum Öffnen beim Anbieter, ohne Einbettung -->
+        <field name="verweis" type="X"/>
+        <!-- Höhe des Rahmens in Pixeln -->
+        <field name="hoehe" type="I">
+            <DEFAULT value="420"/>
+        </field>
+        <!-- Referrer-Richtlinie: manche Dienste liefern ohne Herkunft nichts -->
+        <field name="referrer" type="C" size="40">
+            <DEFAULT value="strict-origin-when-cross-origin"/>
+        </field>
+    </table>
+</schema>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPVideo">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Die Videodatei aus der Dateiverwaltung -->
+        <field name="videofID" type="I">
+            <DEFAULT value="0"/>
+        </field>
+        <!-- Standbild, das vor dem Abspielen zu sehen ist -->
+        <field name="posterfID" type="I">
+            <DEFAULT value="0"/>
+        </field>
+        <!-- Worum es im Video geht; zugleich die Beschriftung für Screenreader -->
+        <field name="titel" type="C" size="255"/>
+        <!-- Bildunterschrift unter dem Spieler -->
+        <field name="text" type="X"/>
+        <!-- Untertitelspuren als JSON: dateifID, sprache, beschriftung, standard -->
+        <field name="spuren" type="X2"/>
+        <!-- schmal | voll | breit -->
+        <field name="breite" type="C" size="16">
+            <DEFAULT value="voll"/>
+        </field>
+        <!-- none | metadata | auto -->
+        <field name="vorladen" type="C" size="16">
+            <DEFAULT value="metadata"/>
+        </field>
+        <!-- Ohne Ton starten und in Schleife laufen lassen -->
+        <field name="schleife" type="I" size="1">
+            <DEFAULT value="0"/>
+        </field>
+        <!-- Farbe von Fortschritt, Lautstärke und Fokusring. Kürzel aus
+             der Palette im Controller, oder 'eigen' zusammen mit akzentEigen -->
+        <field name="akzent" type="C" size="20">
+            <DEFAULT value="gelb"/>
+        </field>
+        <!-- Farbe des großen Abspielknopfes -->
+        <field name="knopf" type="C" size="20">
+            <DEFAULT value="blau"/>
+        </field>
+        <!-- Freie Farbwerte, nur bei 'eigen' benutzt: #rrggbb -->
+        <field name="akzentEigen" type="C" size="7"/>
+        <field name="knopfEigen" type="C" size="7"/>
+    </table>
+</schema>

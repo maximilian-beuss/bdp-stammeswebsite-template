@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPHero">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Liste der Folien als JSON, siehe \EinfachBdP\Werkzeug::liste -->
+        <field name="folien" type="X2"/>
+        <!-- Millisekunden zwischen zwei Folien; 0 schaltet den Wechsel ab -->
+        <field name="takt" type="I" size="6">
+            <DEFAULT value="7000"/>
+        </field>
+        <field name="hoehe" type="C" size="16">
+            <DEFAULT value="normal"/>
+        </field>
+    </table>
+</schema>

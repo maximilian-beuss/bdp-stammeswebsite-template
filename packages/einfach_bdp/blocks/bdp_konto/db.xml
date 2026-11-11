@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPKonto">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Überschrift über den Kontodaten -->
+        <field name="ueberschrift" type="C" size="255">
+            <DEFAULT value="Kontodaten"/>
+        </field>
+        <!-- Einleitender Satz -->
+        <field name="einleitung" type="X"/>
+        <!-- Die Bankverbindung -->
+        <field name="bank" type="C" size="120"/>
+        <field name="empfaenger" type="C" size="255"/>
+        <field name="iban" type="C" size="40"/>
+        <field name="bic" type="C" size="20"/>
+        <!-- Hinweis zum Verwendungszweck, steht nur auf der Seite -->
+        <field name="zweckHinweis" type="X"/>
+        <!-- GiroCode anzeigen -->
+        <field name="zeigeCode" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+    </table>
+</schema>

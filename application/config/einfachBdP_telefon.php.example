@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * application/config/einfachBdP_telefon.php.example
+ * ================================================================
+ * VORLAGE. Die echte Datei heißt einfachBdP_telefon.php und liegt
+ * NICHT im Git-Repo (.gitignore sperrt sie aus) — sie enthält die
+ * privaten Mobilnummern der Ansprechpersonen und den Turnstile-Secret.
+ *
+ * Einrichten (lokal wie auf dem Server):
+ *   cp application/config/einfachBdP_telefon.php.example \
+ *      application/config/einfachBdP_telefon.php
+ *   chmod 600 application/config/einfachBdP_telefon.php
+ *
+ * Dann eintragen:
+ *   - Namen, Ämter und Nummern der Ansprechpersonen
+ *   - die ECHTEN Turnstile-Schlüssel (siehe Kommentar unten)
+ *
+ * Fehlt die Datei, zeigt der Telefon-Block eine leere Liste. Die
+ * Seite bleibt bedienbar, es fehlen nur die Nummern.
+ */
+
+
+/**
+ * Telefonnummern des Stammes — die einzige Stelle, an der sie stehen.
+ * ---------------------------------------------------------------------
+ * ACHTUNG: Diese Nummern gehören NICHT ins HTML.
+ *
+ * Sie werden ausschließlich über den geprüften Endpunkt
+ * /telefon/pruefen ausgeliefert, und zwar erst, nachdem in derselben
+ * Sitzung serverseitig eine Rechenaufgabe richtig beantwortet wurde
+ * (siehe Application\EinfachBdP\Telefon\Captcha und …\Endpunkt).
+ *
+ * Wer sie irgendwo direkt in eine Seite, ein Template, ein
+ * data-Attribut oder eine JavaScript-Variable schreibt, hebelt den
+ * ganzen Schutz aus: Sammelskripte lesen genau das aus.
+ *
+ * Ändern sich Nummern, Namen oder Ämter, wird das hier gepflegt —
+ * sonst nirgends.
+ */
+
+return [
+
+    /**
+     * nummer  — genau so, wie sie angezeigt wird (Leerzeichen als Gruppen).
+     * name    — Rufname, steht auch sichtbar auf der Seite.
+     * rolle   — Amt, steht auch sichtbar auf der Seite.
+     */
+    'nummern' => [
+        [
+            'name' => 'Vorname',
+            'rolle' => 'Stammesführung',
+            'nummer' => '+49 000 0000000',
+        ],
+        [
+            'name' => 'Vorname',
+            'rolle' => 'Kasse',
+            'nummer' => '+49 000 0000000',
+        ],
+    ],
+
+    /**
+     * Cloudflare Turnstile.
+     * ------------------------------------------------------------------
+     * Beide Schlüssel holst du unter
+     *   Cloudflare-Dashboard → Turnstile → Add Site
+     * Als Domain trägst du dort die Domains ein, unter denen die Seite
+     * läuft. Für lokale Entwicklung gehört „localhost“ dazu.
+     *
+     * sitekey — öffentlich. Steht im Quelltext der Seite, das ist so
+     *           vorgesehen und unbedenklich.
+     * secret  — GEHEIM. Verlässt den Server nie, wird nur für die
+     *           Rückfrage bei Cloudflare benutzt. Niemals ins Theme,
+     *           nie in ein Repository, nie ins HTML.
+     *
+     * Voreingestellt sind Cloudflares offizielle TESTSCHLÜSSEL. Damit
+     * lässt sich der ganze Ablauf prüfen, ohne einen Account zu haben:
+     * Das Widget zeigt sich, jedes Token gilt als gültig.
+     *
+     *   1x00000000000000000000AA               Sitekey, besteht immer
+     *   1x0000000000000000000000000000000AA    Secret, besteht immer
+     *
+     * Weitere Testschlüssel von Cloudflare, falls du Fehlerfälle sehen
+     * willst:
+     *   2x00000000000000000000AB               Sitekey, scheitert immer
+     *   2x0000000000000000000000000000000AA    Secret, scheitert immer
+     *   3x00000000000000000000FF               Sitekey, fordert immer
+     *                                          eine Interaktion
+     *
+     * VOR DEM LIVEGANG durch die echten Schlüssel ersetzen. Solange die
+     * Testschlüssel stehen, schützt das Captcha gar nichts.
+     */
+    'turnstile' => [
+        'sitekey' => '1x00000000000000000000AA',
+        'secret' => '1x0000000000000000000000000000000AA',
+    ],
+
+    /**
+     * Schrauben der Drossel. Alle Zeiten in Sekunden.
+     *
+     * freigabe_gueltig— so lange gilt eine bestandene Prüfung. Danach
+     *                   muss erneut gelöst werden.
+     * versuche_max    — abgelehnte Token je Sitzung, bevor gesperrt wird.
+     * sperre          — Sperrdauer der Sitzung nach zu vielen Ablehnungen.
+     * ip_versuche_max — abgelehnte Token je IP-Adresse im Zeitfenster
+     *                   ip_fenster. Ohne das könnte man einfach das
+     *                   Sitzungs-Cookie wegwerfen und weitermachen. Fängt
+     *                   auch den Fall ab, dass jemand gültige Token über
+     *                   einen Löserdienst einkauft.
+     */
+    'captcha' => [
+        'freigabe_gueltig' => 600,
+        'versuche_max' => 4,
+        'sperre' => 900,
+        'ip_versuche_max' => 20,
+        'ip_fenster' => 3600,
+    ],
+];

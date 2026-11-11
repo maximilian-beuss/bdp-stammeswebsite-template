@@ -1,0 +1,155 @@
+<?php
+
+namespace Concrete\Core\Filesystem;
+
+use Concrete\Core\Application\Application;
+use Concrete\Core\Cache\Level\OverridesCache;
+use Concrete\Core\Filesystem\FileLocator\ApplicationLocation;
+use Concrete\Core\Filesystem\FileLocator\CoreLocation;
+use Concrete\Core\Filesystem\FileLocator\LocationInterface;
+use Concrete\Core\Filesystem\FileLocator\PackageLocation;
+use Concrete\Core\Filesystem\FileLocator\Record;
+use Illuminate\Filesystem\Filesystem;
+
+class FileLocator
+{
+    protected $filesystem;
+
+    protected $app;
+
+    /** @var LocationInterface[] */
+    protected $locations = [];
+
+    /**
+     * @var OverridesCache
+     */
+    protected $cache;
+
+    public function __construct(Filesystem $filesystem, Application $app)
+    {
+        $this->filesystem = $filesystem;
+        $this->app = $app;
+        $this->cache = $app->make('cache/overrides');
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFilesystem()
+    {
+        return $this->filesystem;
+    }
+
+    /**
+     * @param Filesystem $filesystem
+     */
+    public function setFilesystem($filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
+    public function addLocation(LocationInterface $location)
+    {
+        $this->locations[] = $location;
+    }
+
+    public function addPackageLocation($pkgHandle)
+    {
+        $this->locations[] = new PackageLocation($pkgHandle);
+    }
+
+    /**
+     * @deprecated
+     * Adds locations to the searchable locations for a file locator. Instead, just call `getSearchLocations`
+     * @return void
+     */
+    public function addDefaultLocations()
+    {
+        array_unshift($this->locations, new ApplicationLocation($this->filesystem));
+        $this->locations[] = new CoreLocation($this->filesystem);
+    }
+
+    public function getAllRecords($file)
+    {
+        $records = [];
+        foreach ($this->getSearchLocations() as $location) {
+            $location->setFilesystem($this->filesystem);
+            if ($record = $location->contains($file)) {
+                $records[] = $record;
+            }
+        }
+
+        return $records;
+    }
+
+    /**
+     * @param $file
+     * @return Record|null
+     */
+    public function getRecord($file)
+    {
+        $key = $this->getCacheKey($file);
+        $item = $this->cache->getItem($key);
+        $record = null;
+
+        if ($item->isMiss()) {
+            $item->lock();
+            foreach ($this->getSearchLocations() as $location) {
+                $location->setFilesystem($this->filesystem);
+                if ($record = $location->contains($file)) {
+                    break;
+                }
+            }
+
+            if (isset($record)) {
+                $this->cache->save($item->set($record));
+            }
+        } else {
+            $record = $item->get();
+        }
+
+        return $record;
+    }
+
+    /**
+     * @return LocationInterface[]
+     */
+    public function getLocations()
+    {
+        return $this->locations;
+    }
+
+    /**
+     * Return the effective ordered list of locations used during file lookup.
+     *
+     * This includes the default application and core locations around any
+     * explicitly configured custom locations without mutating the locator state.
+     *
+     * @return LocationInterface[]
+     */
+    public function getSearchLocations()
+    {
+        return array_merge(
+            [new ApplicationLocation($this->filesystem)],
+            $this->locations,
+            [new CoreLocation($this->filesystem)]
+        );
+    }
+
+    protected function getCacheKey($file)
+    {
+        $keys = [];
+        $file = trim(str_replace('/', DIRECTORY_SEPARATOR, $file), DIRECTORY_SEPARATOR);
+        foreach ($this->getSearchLocations() as $location) {
+            $cacheKey = $location->getCacheKey();
+            if (is_array($cacheKey)) {
+                $keys = array_merge($keys, $cacheKey);
+            } else {
+                $keys[] = $cacheKey;
+            }
+        }
+        $keys = array_merge($keys, explode(DIRECTORY_SEPARATOR, $file));
+
+        return 'overrides.' . md5(implode('.', $keys));
+    }
+}

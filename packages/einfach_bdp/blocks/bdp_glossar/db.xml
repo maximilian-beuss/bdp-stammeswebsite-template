@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPGlossar">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Liste als JSON: begriff, erklaerung -->
+        <field name="eintraege" type="X2"/>
+        <field name="zeigeSuche" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="zeigeAlphabet" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+    </table>
+</schema>

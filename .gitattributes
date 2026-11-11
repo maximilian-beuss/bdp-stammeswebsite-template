@@ -1,0 +1,29 @@
+# ============================================================
+# .gitattributes — Stamm der Vaganten
+# ============================================================
+# Entwickelt wird auf Windows, ausgeliefert wird auf Linux
+# (netcup). Git für Windows kommt mit core.autocrlf=true, würde
+# also beim Auschecken CRLF schreiben und beim Committen wieder
+# LF daraus machen.
+#
+# Für PHP, CSS und JS wäre das folgenlos. Für zwei Sorten Datei
+# aber nicht:
+#
+#   - concrete/bin/concrete hat eine Shebang-Zeile. Mit CRLF liest
+#     der Linux-Kernel den Interpreter als „php\r" und der
+#     Cron-Job bricht mit „bad interpreter" ab.
+#   - In concrete/vendor/ liegen Binärdateien (Schriften, Audio,
+#     Zertifikate). Erkennt Git eine davon fälschlich als Text,
+#     zerstört die Umwandlung sie still.
+#
+# `* -text` schaltet jede Umwandlung ab: Git speichert Bytes so,
+# wie sie auf der Platte liegen, und checkt sie genauso wieder
+# aus. Damit ist der Stand auf netcup byteweise der Stand, der
+# hier getestet wurde — und das ist bei einer Auslieferung ohne
+# Build-Schritt genau das, was man will.
+#
+# Ergänzend ist im Repo core.autocrlf=false gesetzt
+# (git config --local core.autocrlf false).
+# ============================================================
+
+* -text

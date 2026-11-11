@@ -1,0 +1,190 @@
+/* ============================================================
+   Design-Tokens — einfachBdP
+   ------------------------------------------------------------
+   Quelle: BdP Corporate Design, Version 317 (05.08.2026)
+   Lesehilfe   ✅ = exakt so im CD vorgegeben
+               🔶 = abgeleitet / Entwurf, nicht im CD
+   ============================================================ */
+
+:root {
+
+  /* ---------- Primärfarben ✅ ---------- */
+  --bdp-blau:            #0E4278;  /* Pfadiblau      · Pantone 4154 C */
+  --bdp-gelb:            #FFD208;  /* Wölflingsgelb  · Pantone 109 C  */
+  --bdp-rot:             #971B2F;  /* R*R-Rot        · Pantone 7427 C */
+
+  /* ---------- Sekundärfarben hell ✅ ---------- */
+  --bdp-blau-hell:       #A9BBCE;
+  --bdp-gelb-hell:       #FFE984;
+  --bdp-rot-hell:        #D5A4AC;
+
+  /* ---------- Sekundärfarben dunkel ✅ ---------- */
+  --bdp-blau-dunkel:     #0B2341;  /* "Kluft" */
+  --bdp-gelb-dunkel:     #8B7417;
+  --bdp-rot-dunkel:      #52111B;
+
+  /* ---------- Akzentfarben ✅ — nur Ikons und Striche! ---------- */
+  --bdp-lagerplatzgruen: #00B74F;
+  --bdp-waldgruen:       #006C55;
+  --bdp-kohte:           #222423;  /* das Schwarz des CD */
+  --bdp-glut:            #E84E1B;
+  --bdp-lagerfeuer:      #EF7D00;
+  --bdp-morgenkreis:     #EF859D;
+  --bdp-singekreis:      #8E7FAE;
+  /* #653279 "Internationalerabend" ist dem AK International vorbehalten
+     und deshalb hier bewusst nicht als Token angelegt. */
+
+  --bdp-weiss:           #FFFFFF;
+
+  /* ---------- Semantische Ebene 🔶 ---------- */
+  /* Text */
+  --c-text:              var(--bdp-kohte);        /* 15,62:1 auf Weiß · AAA */
+  --c-text-leise:        #55595B;                 /*  7,00:1 auf Weiß · AAA */
+  --c-text-invers:       var(--bdp-weiss);
+  --c-link:              var(--bdp-blau);         /* 10,15:1 auf Weiß · AAA */
+  --c-link-hover:        var(--bdp-blau-dunkel);  /* 15,78:1          · AAA */
+
+  /* Flächen */
+  --c-bg:                var(--bdp-weiss);
+  --c-bg-gedaempft:      #F4F6F8;
+  --c-bg-akzent:         var(--bdp-blau);
+  --c-bg-signal:         var(--bdp-gelb);
+  --c-rahmen:            var(--bdp-blau-hell);
+
+  /* Buttons */
+  --c-btn-primaer-bg:    var(--bdp-blau);
+  --c-btn-primaer-text:  var(--bdp-weiss);        /* 10,15:1 · AAA */
+  --c-btn-sekundaer-bg:  var(--bdp-gelb);
+  --c-btn-sekundaer-text:var(--bdp-blau);         /*  7,00:1 · AAA */
+  --c-btn-gefahr-bg:     var(--bdp-rot);
+  --c-btn-gefahr-text:   var(--bdp-weiss);        /*  8,35:1 · AAA */
+
+  /* Fokus */
+  --c-fokus:             var(--bdp-gelb);
+  --c-fokus-dunkel:      var(--bdp-blau);
+
+  /* ---------- Schrift ✅ ---------- */
+  --font-basis:  "einfachBdP", "Jost", "Century Gothic", "Futura",
+                 system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* MARKS — BdP-Akzentschrift, lizenziert für die Nutzung im Stamm.
+     Nur Versalien, nur für kurze Hervorhebungen (Etiketten, Stempel,
+     Stufenmarken) — ✅ CD: „Akzentschrift, nur Versalien, nur für
+     kurze Hervorhebungen". Nie für Headlines, Sublines oder Fließtext. */
+  --font-akzent: "MARKS", "einfachBdP", "Jost", sans-serif;
+
+  /* ---------- Typo-Skala 🔶 (CD-Verhältnisse auf 18 px Basis) ---------- */
+  --fs-h1:      clamp(2.25rem, 5vw,   4.5rem);
+  --fs-h2:      clamp(1.75rem, 3.5vw, 3rem);
+  --fs-h3:      clamp(1.5rem,  2.5vw, 2.25rem);
+  --fs-h4:      1.5rem;
+  --fs-h5:      1.25rem;
+  --fs-h6:      1.125rem;
+  --fs-body:    1.125rem;
+  --fs-klein:   0.875rem;
+  --fs-winzig:  0.75rem;
+
+  --lh-h1: 1.15;  --lh-h2: 1.25;  --lh-h3: 1.33;
+  --lh-h4: 1.4;   --lh-body: 1.6;
+
+  /* ---------- Raster & Maße 🔶 ---------- */
+  --sp-1: .25rem; --sp-2: .5rem;  --sp-3: .75rem; --sp-4: 1rem;
+  --sp-6: 1.5rem; --sp-8: 2rem;   --sp-12: 3rem;  --sp-16: 4rem; --sp-24: 6rem;
+
+  --container:       1200px;
+  --container-weit:  1560px;
+  --container-text:  68ch;
+  --gutter:          var(--sp-6);
+
+  --radius:          12px;   /* passt zum weichen Kohten-Duktus */
+  --radius-gross:    24px;
+
+  /* ---------- Diagonalen 🔶 — der Kohtenanschnitt im Web ---------- */
+  --diagonale:       11vw;   /* horizontaler Versatz der Schnittkante */
+
+  /* Eigene, sehr flache Schräge für den Fußbereich. 11vw wären dort über
+     150 px Höhenunterschied, 4,5vw immer noch 65 px. Beides ist für eine
+     kompakte Fußzeile zu viel: Die Schräge kostet ihre Höhe zweimal, denn
+     der Innenabstand oben muss sie ausgleichen, sonst läge Text im
+     Anschnitt. 2vw (29 px bei 1440 px) reicht als Geste und kostet fast
+     nichts. Nach oben gedeckelt, damit sie auf breiten Schirmen nicht
+     mitwächst, nach unten, damit sie auf Telefonen nicht verschwindet.
+     Abschnitt 13 in main.css rechnet mit dem Wert — nur hier ändern. */
+  --fuss-diagonale:  clamp(16px, 2vw, 30px);
+
+  /* Mindesthöhen von Topbar und Kopf. */
+  --h-topbar:        30px;
+  --h-kopf:          88px;
+
+  /* Überstand des Keils nach oben. Bewusst großzügig: Er muss über
+     Topbar UND Kopf hinausreichen, damit sein oberes Segment in der
+     Topbar sichtbar wird. Was darüber hinausragt, liegt außerhalb der
+     Seite und stört nicht. So hängt die Form nicht daran, ob der Kopf
+     ein paar Pixel höher oder niedriger ausfällt. */
+  --keil-hoch:       200px;
+
+  /* Der Kohtenanschnitt der Kopfzone: EIN Element, das von der Topbar
+     bis zum unteren Rand von Hero bzw. Seitenkopf durchläuft. Der weiße
+     Kopf liegt darüber und verdeckt die Mitte — sichtbar bleiben zwei
+     Segmente auf einer Geraden. ✅ nur ein Anschnitt, ✅ am Rand */
+  --keil-breite:     clamp(56px, 11vw, 190px);
+  --keil-oben:       58%;    /* x der Kante oben, in % der Keilbreite */
+  --keil-unten:      0%;     /* x der Kante unten                     */
+
+  /* Höhe des Bildwechslers auf der Startseite */
+  --hero-hoehe:      clamp(380px, 62vh, 660px);
+
+
+  /* ---------- Schatten 🔶 ---------- */
+  --schatten-karte:  0 2px 4px rgba(11, 35, 65, .06),
+                     0 12px 32px rgba(11, 35, 65, .10);
+  --schatten-menue:  0 12px 40px rgba(11, 35, 65, .18);
+
+  /* ---------- Bewegung 🔶 — dezent, nie aufdringlich ---------- */
+  --zeit-kurz:   140ms;
+  --zeit-mittel: 260ms;
+  --zeit-lang:   520ms;
+  --kurve:       cubic-bezier(.22, .61, .36, 1);
+}
+
+/* ============================================================
+   Schriften — einfachBdP, lokal ausgeliefert
+   Ableitung von Jost* (indestructible-type), SIL OFL 1.1.
+   Self-Hosting ausdrücklich erlaubt · siehe fonts/LICENSE.txt
+   Alle vier Schnitte melden denselben Familiennamen und müssen
+   deshalb über font-weight / font-style getrennt werden. ✅
+   ============================================================ */
+
+@font-face {
+  font-family: "einfachBdP";
+  src: url("../fonts/einfachBdP-Klassisch.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "einfachBdP";
+  src: url("../fonts/einfachBdP-Kursiv.woff2") format("woff2");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "einfachBdP";
+  src: url("../fonts/einfachBdP-Stark.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "einfachBdP";
+  src: url("../fonts/einfachBdP-Superfett.woff2") format("woff2");
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+
+/* ============================================================
+   MARKS — BdP-Akzentschrift
+   ------------------------------------------------------------
+   Lizensiert für die Nutzung im BdP. Wird lokal
+   ausgeliefert. Verwendung: nur Versalien, nur kurze Hervor­
+   hebungen, nie Headlines/Sublines/Fließtext.
+   ============================================================ */
+
+@font-face {
+  font-family: "MARKS";
+  src: url("../fonts/MARKS.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}

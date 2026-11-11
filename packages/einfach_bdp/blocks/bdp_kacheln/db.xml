@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPKacheln">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- unterseiten | manuell -->
+        <field name="quelle" type="C" size="16">
+            <DEFAULT value="unterseiten"/>
+        </field>
+        <!-- Liste der Kacheln als JSON, nur bei quelle = manuell -->
+        <field name="kacheln" type="X2"/>
+        <!-- Startpunkt bei quelle = unterseiten; 0 = diese Seite -->
+        <field name="elternID" type="I" size="10">
+            <UNSIGNED/>
+            <DEFAULT value="0"/>
+        </field>
+        <!-- auto | 2 | 3 | 4 -->
+        <field name="spalten" type="C" size="8">
+            <DEFAULT value="auto"/>
+        </field>
+        <field name="zeigeBild" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="zeigeText" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="knopfText" type="C" size="80">
+            <DEFAULT value="Mehr erfahren"/>
+        </field>
+    </table>
+</schema>

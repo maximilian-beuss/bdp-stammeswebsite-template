@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+        setup: ['lowest', 'stable']
+
+    name: Test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, imagick, json, mbstring, pcntl, pdo, pdo_sqlite, sqlite, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Check Composer Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ matrix.php }}-${{ matrix.setup }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.php }}-${{ matrix.setup }}-composer-
+
+      - name: Set PHPUnit version
+        if: matrix.php >= 7.1 && matrix.php < 8.0
+        run: composer require --no-update phpunit/phpunit:^5.7.27 --no-interaction --dev
+
+      - name: Set PHPUnit version
+        if: matrix.php >= 8.0 && matrix.php < 8.1
+        run: composer require --no-update phpunit/phpunit:^8.5.32 --no-interaction --dev
+
+      - name: Set PHPUnit version
+        if: matrix.php >= 8.1
+        run: composer require --no-update phpunit/phpunit:^9.5.20 --no-interaction --dev
+
+      - name: Install Composer Dependencies
+        run: composer update --prefer-dist --no-progress --prefer-${{ matrix.setup }}
+
+      - name: PHPUnit
+        run: ./vendor/bin/phpunit

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPAbschnitt">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <field name="ueberschrift" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <!-- h2 | h3 | keine -->
+        <field name="ebene" type="C" size="8">
+            <DEFAULT value="h2"/>
+        </field>
+        <field name="text" type="X2"/>
+        <!-- weiss | gedaempft | sand | gelb | blau -->
+        <field name="flaeche" type="C" size="16">
+            <DEFAULT value="weiss"/>
+        </field>
+        <!-- Ikon aus dem BdP-Zeichensatz, neben der Überschrift -->
+        <field name="ikon" type="C" size="32">
+            <DEFAULT value=""/>
+        </field>
+        <field name="ankerName" type="C" size="80">
+            <DEFAULT value=""/>
+        </field>
+        <!--
+            Ein Bild, das zu diesem Abschnitt gehört.
+
+            Bewusst hier und nicht als eigener Block: Ein Bild, um das
+            der Text herumfließen soll, muss im selben Kasten stehen
+            wie der Text. Als eigener Block davor würde der Umfluss
+            über alle folgenden Blöcke laufen und wäre nicht mehr zu
+            beherrschen.
+        -->
+        <field name="bildfID" type="I" size="10">
+            <UNSIGNED/>
+            <DEFAULT value="0"/>
+        </field>
+        <field name="bildText" type="C" size="255">
+            <DEFAULT value=""/>
+        </field>
+        <!-- kein | links | rechts | oben | unten -->
+        <field name="bildStil" type="C" size="12">
+            <DEFAULT value="kein"/>
+        </field>
+    </table>
+</schema>

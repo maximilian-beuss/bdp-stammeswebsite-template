@@ -1,0 +1,206 @@
+/* ============================================================
+   Telefon-Widget
+   ------------------------------------------------------------
+   Je Person ein Kästchen: links Name und Amt, rechts die Nummer.
+
+   Vor dem Lösen steht dort die Vorwahl und danach eine Reihe
+   blauer Kreise und Sechsecke — eine je verdeckter Stelle. Sie
+   drehen sich in unregelmäßigen Abständen, damit das Kästchen
+   lebt, ohne zu flackern.
+
+   Vorher waren es gewürfelte Ziffern auf einem Canvas. Das sah
+   nach Störung aus, war laufend in Bewegung und für
+   Screenreader eine bedeutungslose Fläche.
+
+   Eigene Datei neben main.css, damit der Baustein als Ganzes
+   austauschbar bleibt — er hängt an telefon.js und an eigenen
+   Endpunkten.
+   ============================================================ */
+
+.v-telefon { margin-bottom: var(--sp-8); }
+
+
+/* ------------------------------------------------------------
+   Ohne JavaScript bleibt der E-Mail-Weg stehen. Die Klasse
+   .hat-js setzt header_top.php, .ist-alt setzt telefon.js, wenn
+   der Browser oder Cloudflare nicht mitspielt.
+   ------------------------------------------------------------ */
+.v-telefon__mit-js { display: none; }
+.hat-js .v-telefon__mit-js { display: block; }
+.hat-js .v-telefon__ersatz { display: none; }
+
+.hat-js .v-telefon.ist-alt .v-telefon__mit-js { display: none; }
+.hat-js .v-telefon.ist-alt .v-telefon__ersatz { display: block; }
+
+.v-telefon__ersatz {
+  margin: 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+  max-width: var(--container-text);
+}
+
+
+/* ------------------------------------------------------------
+   Die Kästchen
+   ------------------------------------------------------------ */
+.v-telefon__liste {
+  list-style: none;
+  margin: 0 0 var(--sp-6);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 34rem;
+}
+
+.v-telefon__eintrag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-gedaempft);
+  /* Keine Rundung: die Kanten des CD sind gerade. */
+  border-left: 4px solid var(--bdp-blau);
+}
+
+.v-telefon__name {
+  display: flex;
+  flex-direction: column;
+  min-width: 6rem;
+  font-weight: 700;
+  color: var(--bdp-blau);
+  line-height: 1.2;
+}
+.v-telefon__rolle {
+  font-size: var(--fs-winzig);
+  font-weight: 400;
+  color: var(--c-text-leise);
+  letter-spacing: .04em;
+}
+
+/* Der Platz für die Nummer. Vorwahl und Formen stehen in einer
+   Zeile, damit es aussieht wie eine Nummer und nicht wie ein
+   Ladebalken. */
+.v-telefon__wert {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;                 /* Zielfläche ✅ WCAG 2.5.5 */
+  font-size: var(--fs-h5);
+  font-variant-numeric: tabular-nums;
+}
+
+.v-telefon__vorwahl {
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+
+
+/* ------------------------------------------------------------
+   Die verdeckten Stellen
+   ------------------------------------------------------------ */
+.v-telefon__verdeckt {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.v-telefon__form {
+  --dreh: 0deg;
+
+  display: block;
+  /* Groß genug, dass man Sechseck und Kreis auseinanderhält — bei
+     11 px sah beides gleich aus und die Drehung war unsichtbar. */
+  width: 14px;
+  height: 16px;
+  background: var(--bdp-blau);
+  opacity: .42;
+  transform: rotate(var(--dreh));
+  /* Lang und weich: Die Drehung soll nebenbei passieren, nicht
+     die Aufmerksamkeit vom Text daneben wegziehen. */
+  transition: transform 1.1s var(--kurve);
+}
+
+/* Das Sechseck ist die Form des Stammeslogos. */
+.v-telefon__form--sechseck {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.v-telefon__form--kreis {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+/* Alle drei Stellen eine Lücke — dann liest sich die Reihe wie
+   eine gruppierte Rufnummer. */
+.v-telefon__form--luecke { margin-left: 7px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v-telefon__form { transition: none; }
+}
+
+
+/* ------------------------------------------------------------
+   Die freigeschaltete Nummer
+   ------------------------------------------------------------
+   Ganz normaler Text in einem tel:-Link. Der Schutz war, dass die
+   Nummer nicht im HTML stand; den hat sie hinter sich. Wer das
+   Captcha gelöst hat, darf sie auch kopieren — und Screenreader,
+   Sprachsteuerung und die Anruffunktion kommen an einen Textlink
+   heran, an eine gemalte Fläche nicht.
+   ------------------------------------------------------------ */
+.v-telefon__anruf {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  color: var(--bdp-blau);
+  text-decoration: none;
+  border-bottom: 2px solid var(--bdp-gelb);
+  transition: border-bottom-width var(--zeit-kurz) var(--kurve);
+}
+.v-telefon__anruf:hover { border-bottom-width: 4px; }
+
+/* Kurzes Aufblenden, wenn die echte Nummer erscheint 🔶 */
+@keyframes v-telefon-auf {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+.v-telefon__wert--frisch { animation: v-telefon-auf var(--zeit-mittel) var(--kurve); }
+@media (prefers-reduced-motion: reduce) {
+  .v-telefon__wert--frisch { animation: none; }
+}
+
+
+/* ------------------------------------------------------------
+   Das Captcha und der Satz darunter
+   ------------------------------------------------------------ */
+.v-telefon__schloss:not(:empty) { margin-bottom: var(--sp-3); }
+
+.v-telefon__hinweis {
+  margin: 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+.v-telefon.ist-frei .v-telefon__hinweis { display: none; }
+
+.v-telefon__meldung {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+  min-height: 1.4em;
+}
+.v-telefon__meldung--fehler {
+  color: var(--bdp-rot-dunkel);       /* 8,35:1 auf Weiß ✅ */
+  font-weight: 700;
+}
+
+
+/* ------------------------------------------------------------
+   Druck: Captcha und Meldungen sind auf Papier sinnlos
+   ------------------------------------------------------------ */
+@media print {
+  .v-telefon__schloss,
+  .v-telefon__meldung,
+  .v-telefon__hinweis { display: none; }
+}

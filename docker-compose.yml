@@ -1,0 +1,56 @@
+# Lokale Entwicklungsumgebung — einfachBdP
+#
+# Startet: PHP 8.2 (Apache), MySQL 8, phpMyAdmin.
+# Nicht für den Live-Betrieb gedacht (siehe DEPLOYMENT.md für netcup).
+#
+# Benutzung:
+#   Siehe docker/README.md für die Datenbank-Einrichtung und den Start.
+#   http://localhost:8080        — die Seite
+#   http://localhost:8081        — phpMyAdmin
+services:
+  web:
+    build: ./docker/php
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Nur für die lokale Entwicklungsumgebung des historischen Archivs.
+      - VAGANTEN_ARCHIVE_PASSWORD=archiv-dev
+
+  db:
+    image: mysql:8.0
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "127.0.0.1:3307:3306"
+    environment:
+      MYSQL_DATABASE: vaganten
+      MYSQL_USER: vaganten
+      MYSQL_PASSWORD: vaganten
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - vaganten-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 128M
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  vaganten-db-data:

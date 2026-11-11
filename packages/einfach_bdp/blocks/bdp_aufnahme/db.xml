@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPAufnahme">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!-- Liste der Schritte als JSON -->
+        <field name="schritte" type="X2"/>
+        <!-- Text im Bestätigungsfenster vor einem externen Link -->
+        <field name="hinausTitel" type="C" size="160">
+            <DEFAULT value="Du verlässt kurz unsere Seite"/>
+        </field>
+        <field name="hinausText" type="X2"/>
+        <!-- Fortschritt im Browser merken, damit man wiederkommt -->
+        <field name="merken" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+    </table>
+</schema>

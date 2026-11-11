@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPFuss">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <field name="stammZiel" type="C" size="255">
+            <DEFAULT value="/"/>
+        </field>
+        <field name="bdpZiel" type="C" size="255">
+            <DEFAULT value="https://www.pfadfinden.de/"/>
+        </field>
+        <field name="adresseTitel" type="C" size="160">
+            <DEFAULT value=""/>
+        </field>
+        <!-- Eine Zeile je Zeile, so wie sie erscheinen soll -->
+        <field name="adresseZeilen" type="X2"/>
+        <!-- Kontaktwege als JSON -->
+        <field name="kontakte" type="X2"/>
+        <!-- Rechtslinks als JSON -->
+        <field name="rechtslinks" type="X2"/>
+        <field name="anmelden" type="I" size="1">
+            <DEFAULT value="1"/>
+        </field>
+        <field name="schlusszeile" type="X2"/>
+    </table>
+</schema>

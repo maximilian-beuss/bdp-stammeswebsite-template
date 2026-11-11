@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPKopfzeile">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <field name="stammesname" type="C" size="100">
+            <DEFAULT value="Musterstamm"/>
+        </field>
+        <field name="ort" type="C" size="100">
+            <DEFAULT value="Musterort"/>
+        </field>
+        <!-- Datei-ID aus dem Concrete-Dateimanager; 0 = BdP-Lilie aus dem Theme -->
+        <field name="logoDateifID" type="I" size="10">
+            <UNSIGNED/>
+            <DEFAULT value="0"/>
+        </field>
+        <field name="logoAlt" type="C" size="255">
+            <DEFAULT value="Zur&#252;ck zur Startseite"/>
+        </field>
+        <!-- Links oben links als JSON -->
+        <field name="topbarLinks" type="X2"/>
+        <!-- Links oben rechts als JSON -->
+        <field name="topbarRechts" type="X2"/>
+    </table>
+</schema>

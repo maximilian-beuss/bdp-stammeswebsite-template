@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+    <table name="btBdPTelefon">
+        <field name="bID" type="I">
+            <KEY/>
+            <UNSIGNED/>
+        </field>
+        <!--
+            Die Nummern als JSON.
+
+            Sie stehen damit in der Datenbank und NICHT im HTML. Das ist
+            der ganze Zweck des Blocks: Sammelskripte lesen den Quelltext,
+            und was dort nicht steht, können sie nicht abschreiben.
+        -->
+        <field name="nummern" type="X2"/>
+        <field name="sitekey" type="C" size="120">
+            <DEFAULT value=""/>
+        </field>
+        <field name="secret" type="C" size="120">
+            <DEFAULT value=""/>
+        </field>
+        <field name="textVor" type="X2"/>
+        <field name="textNach" type="X2"/>
+        <field name="hinweis" type="C" size="255">
+            <DEFAULT value="Löse das Captcha, um Telefonnummern anzuzeigen"/>
+        </field>
+        <field name="ersatzMail" type="C" size="160">
+            <DEFAULT value="info@musterstamm.de"/>
+        </field>
+        <!-- Minuten, die eine bestandene Prüfung gilt -->
+        <field name="freigabeMinuten" type="I" size="5">
+            <DEFAULT value="10"/>
+        </field>
+        <!-- 0 = runde Formen (Standard), 1 = Sechsecke -->
+        <field name="sechseckAktiviert" type="I" size="1">
+            <DEFAULT value="0"/>
+        </field>
+    </table>
+</schema>

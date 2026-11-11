@@ -1,0 +1,1949 @@
+/* ============================================================
+   Blöcke des einfachBdP-Pakets
+   ------------------------------------------------------------
+   Abschnitt, Fotogalerie, Kämmerei, Aufnahmeantrag, Kalender.
+
+   Eigene Datei neben main.css: Diese Bausteine gehören zum Paket
+   und nicht zum Grundgerüst des Themes. Wer das Paket abschaltet,
+   verliert damit nur diese Datei und nicht das Layout.
+
+   Reihenfolge der Abschnitte
+     01 Abschnitt
+     02 Fotogalerie
+     03 Kämmerei
+     04 Aufnahmeantrag
+     05 Kalender
+   ============================================================ */
+
+
+/* ============================================================
+   01 Abschnitt
+   ============================================================ */
+
+.v-abschnitt { margin-bottom: var(--sp-12); }
+.v-abschnitt > :last-child { margin-bottom: 0; }
+
+/* Ein umflossenes Bild ragt aus dem normalen Fluss heraus. Ohne das
+   hier stünde der nächste Abschnitt daneben statt darunter. */
+.v-abschnitt::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* --- Bild im Abschnitt --------------------------------------------
+   Der Umfluss bleibt im Abschnitt, weil das ::after ihn abschließt.
+   Genau deshalb sitzt das Bild hier und nicht in einem eigenen Block:
+   Ein Float in einem eigenen Block liefe über alle folgenden Blöcke
+   und wäre nicht mehr zu beherrschen.
+   ------------------------------------------------------------------ */
+
+.v-abschnitt__bild {
+  margin: 0 0 var(--sp-4);
+}
+.v-abschnitt__bild img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.v-abschnitt__bild figcaption {
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-klein);
+  line-height: 1.45;
+  color: var(--c-text-leise);
+}
+.v-abschnitt--blau .v-abschnitt__bild figcaption { color: rgba(255, 255, 255, .82); }
+
+@media (min-width: 620px) {
+  .v-abschnitt--bild-rechts .v-abschnitt__bild {
+    float: right;
+    width: min(42%, 22rem);
+    margin: 0 0 var(--sp-4) var(--sp-6);
+  }
+  .v-abschnitt--bild-links .v-abschnitt__bild {
+    float: left;
+    width: min(42%, 22rem);
+    margin: 0 var(--sp-6) var(--sp-4) 0;
+  }
+}
+
+/* Unter 620 px steht das Bild über dem Text. Ein Float von 42 % wäre
+   auf dem Telefon eine Briefmarke mit einer zweispaltigen
+   Bleiwüste daneben. */
+
+/* --- Farbige Flächen ----------------------------------------------
+   Rückmeldung aus dem Stamm: Unter dem Hero folgten rund drei
+   Bildschirme Text auf Weiß — „schön, aber zu klinisch“. Es fehlten
+   nicht Bilder, sondern Farbwechsel: etwas, woran das Auge merkt,
+   dass ein neues Thema anfängt.
+
+   Fünf Flächen stehen zur Wahl. Weiß und Hellgrau sind die ruhigen,
+   Sand ist der warme Zwischenton, Gelb und Pfadiblau die lauten.
+   Alle Kombinationen liegen über 7:1 ✅ AAA:
+
+     Sand   #FFE984, Text Kohte    → 15,0:1
+     Gelb   #FFD208, Text Pfadiblau →  7,00:1
+     Blau   #0E4278, Text Weiß      → 10,15:1
+   ------------------------------------------------------------------ */
+
+.v-abschnitt--flaeche {
+  position: relative;
+  padding: var(--sp-8);
+  margin-inline: calc(var(--sp-8) * -1);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Abschnitte, deren Text eine eigene <section class="v-sektion">
+   mitbringt, haben ihre Innenabstände schon. Der Rahmen drumherum
+   steuert dann nur noch die Farbe bei — sonst stünde die Überschrift
+   einen halben Bildschirm unter der Farbkante. */
+.v-abschnitt--rahmen.v-abschnitt--flaeche {
+  padding-block: var(--sp-6) 0;
+  padding-inline: 0;
+  /* Kein negativer Außenabstand. Diese Abschnitte stehen in einem
+     Bereich, der schon über die volle Breite geht; zöge man sie
+     zusätzlich nach außen, ragten sie über den Rand hinaus und die
+     Seite ließe sich seitwärts schieben. */
+  margin-inline: 0;
+  border-radius: 0;
+}
+.v-abschnitt--rahmen .v-abschnitt__ikon { margin-bottom: 0; }
+
+.v-abschnitt--gedaempft { background: var(--c-bg-gedaempft); }
+
+.v-abschnitt--sand {
+  background: var(--bdp-gelb-hell);
+  color: var(--c-text);
+}
+
+.v-abschnitt--gelb {
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+}
+.v-abschnitt--gelb a:not(.btn) { color: var(--bdp-blau-dunkel); }
+
+.v-abschnitt--blau {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+}
+.v-abschnitt--blau a:not(.btn) { color: var(--bdp-gelb); }
+
+/* Der Kohtenanschnitt als stille Ecke.
+   ------------------------------------------------------------------
+   Das CD kennt ihn als angeschnittene Form am Rand der Fläche. Hier
+   ist er eine flache Schräge an der unteren rechten Ecke — gerade so
+   viel, dass die Fläche kein reines Rechteck mehr ist.
+
+   Flach und nicht 45°: Ein Dreieck über die halbe Sektionshöhe sieht
+   nicht nach Gestaltung aus, sondern nach kaputtem Layout. Die
+   Neigung entspricht der des Fußbereichs, damit die Seite eine
+   Handschrift behält und nicht zwei.
+
+   Als eigenes Element und nicht per clip-path an der Fläche selbst:
+   clip-path würde den Text mit abschneiden, sobald jemand einen
+   längeren Absatz schreibt. */
+.v-abschnitt--flaeche::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: clamp(120px, 26%, 320px);
+  height: clamp(22px, 3vw, 46px);
+  background: var(--c-bg);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+/* Das Ikon sitzt in der Überschriftzeile, direkt vor dem ersten Wort.
+   ------------------------------------------------------------------
+   In em und nicht in Pixeln: Es wächst dann mit der Überschrift mit,
+   über alle Bildschirmbreiten hinweg, und bleibt in jedem Verhältnis
+   dasselbe Zeichen vor demselben Wort.
+
+   inline-block mit vertical-align statt Flexbox an der Überschrift:
+   So bricht die Überschrift weiterhin normal um, und der gestrichelte
+   Strich darunter bleibt, wie er ist. */
+.v-abschnitt__ikon {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  margin-right: .35em;
+  vertical-align: -.16em;
+  background: currentColor;
+  /* Maske statt <img>: Die Ikondateien sind einfarbig blau, und blau
+     auf Pfadiblau sieht niemand. So nimmt das Ikon die Farbe an, die
+     zur Fläche passt, und kann nicht unsichtbar werden. */
+  -webkit-mask: var(--v-ikon) no-repeat center / contain;
+  mask: var(--v-ikon) no-repeat center / contain;
+}
+
+/* Ohne Überschrift steht es allein über dem Text und darf dann
+   größer sein — dort trägt es die Fläche. */
+.v-abschnitt > .v-abschnitt__ikon,
+.v-abschnitt > .container > .v-abschnitt__ikon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 0 var(--sp-4);
+  vertical-align: baseline;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+}
+
+/* Die Farbe kommt aus der Überschrift, in der das Ikon steht: auf
+   hellen Flächen Pfadiblau, auf Pfadiblau Wölflingsgelb. Damit stimmt
+   sie immer, auch auf einer Fläche, die es heute noch nicht gibt —
+   und ein unsichtbares Ikon kann es nicht geben.
+
+   Nur das alleinstehende Ikon braucht eine eigene Angabe: Es erbt
+   sonst die Fließtextfarbe und wäre auf Weiß schwarz statt blau. */
+.v-abschnitt > .v-abschnitt__ikon,
+.v-abschnitt > .container > .v-abschnitt__ikon { color: var(--bdp-blau); }
+
+.v-abschnitt--blau > .v-abschnitt__ikon,
+.v-abschnitt--blau > .container > .v-abschnitt__ikon { color: var(--bdp-gelb); }
+
+/* Das Ikon steht im normalen Fluss über der Überschrift und damit
+   bündig mit dem Text.
+
+   Kein Raster mit eigener Ikonspalte: Die farbigen Flächen ziehen
+   sich über die Ränder des Textbereichs hinaus, eine Spalte links
+   landete deshalb im Außenabstand, und das Ikon stand einsam in der
+   Ecke statt bei dem Text, auf den es sich bezieht. */
+
+@media (max-width: 700px) {
+  .v-abschnitt--flaeche {
+    padding: var(--sp-6) var(--sp-4);
+    margin-inline: calc(var(--sp-4) * -1);
+  }
+  .v-abschnitt--rahmen.v-abschnitt--flaeche { padding-block: var(--sp-4) 0; }
+  .v-abschnitt__ikon { width: 38px; height: 38px; }
+}
+
+
+/* ============================================================
+   01b Bild und Bildreihe
+   ------------------------------------------------------------
+   Ein eigenständiges Bild oder mehrere nebeneinander, jeweils
+   mit Bildunterschrift und Quellenangabe.
+
+   Kein Info-Kästchen, kein Aufklappen: Das gibt es nur in der
+   Fotogalerie. Hier steht die Unterschrift schlicht unter dem
+   Bild, wo sie hingehört.
+   ============================================================ */
+
+.v-bilder {
+  margin: var(--sp-8) 0;
+}
+
+.v-bilder--reihe {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.v-bilder--schmal { max-width: 22rem; }
+.v-bilder--breit  { margin-inline: calc(var(--sp-8) * -1); }
+
+@media (max-width: 700px) {
+  .v-bilder--breit { margin-inline: 0; }
+}
+
+.v-bilder__stueck {
+  margin: 0;
+  min-width: 0;
+}
+.v-bilder__stueck img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--c-bg-gedaempft);
+}
+
+/* Zuschnitte. In einer Reihe sorgen sie dafür, dass alle Bilder
+   gleich hoch sind — ohne sie steht unter dem Hochformat eine
+   Stufe. */
+.v-bilder--quer    .v-bilder__stueck img { aspect-ratio: 16 / 9; object-fit: cover; }
+.v-bilder--hoch    .v-bilder__stueck img { aspect-ratio: 3 / 4;  object-fit: cover; }
+.v-bilder--quadrat .v-bilder__stueck img { aspect-ratio: 1;      object-fit: cover; }
+
+.v-bilder__stueck figcaption {
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-klein);
+  line-height: 1.45;
+  color: var(--c-text-leise);
+}
+.v-bilder__stueck cite {
+  display: block;
+  margin-top: 2px;
+  font-style: normal;
+  font-size: var(--fs-winzig);
+  opacity: .85;
+}
+
+.v-bilder__leer,
+.v-raster__leer,
+.v-eckdaten__leer {
+  padding: var(--sp-4);
+  border: 2px dashed var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+
+
+/* ============================================================
+   01c Eckdaten
+   ------------------------------------------------------------
+   Die Faktenliste oben auf einer Gruppenseite.
+
+   Vorher: dicker Balken links, sonst nichts. Jetzt ein dünner
+   Rahmen ringsum in der Stufenfarbe — Meute gelb, Sippe blau,
+   Runde und Thing rot. Ringsum, weil ein Kasten ein Kasten ist;
+   und dünn, weil die Eckdaten dem Text zuarbeiten und ihn nicht
+   überschreien sollen.
+
+   Die Farbe kommt als --stufe aus dem Block, damit sie nur an
+   einer Stelle steht (Stufen::katalog).
+   ============================================================ */
+
+.v-eckdaten {
+  --stufe: var(--bdp-blau);
+
+  display: grid;
+  gap: var(--sp-3) var(--sp-8);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  margin: 0 0 var(--sp-8);
+  padding: var(--sp-4) var(--sp-6);
+  border: 2px solid var(--stufe);
+  background: var(--bdp-weiss);
+}
+
+.v-eckdaten__zeile { min-width: 0; }
+
+.v-eckdaten dt {
+  font-size: var(--fs-winzig);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 700;
+  /* Nicht in der Stufenfarbe: Wölflingsgelb hätte auf Weiß 1,45:1
+     ✅ CD verbietet Gelb als Text auf Weiß. Der Rahmen trägt die
+     Farbe, die Schrift bleibt lesbar. */
+  color: var(--c-text-leise);
+}
+
+.v-eckdaten dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--bdp-blau);
+  overflow-wrap: anywhere;
+}
+
+/* Rot und Blau tragen genug Kontrast, um auch den Wert zu färben.
+   Bei Gelb bleibt es beim Pfadiblau. */
+.v-eckdaten--ranger dd { color: var(--bdp-rot); }
+
+
+/* ============================================================
+   01d Video
+   ------------------------------------------------------------
+   Der Spieler ist Plyr, umgefärbt auf das CD. Plyr lässt sich
+   vollständig über eigene Custom Properties steuern, deshalb
+   steht hier keine einzige Regel, die in die Bedienleiste
+   hineingreift — nur Werte. Ein Versionssprung der Bibliothek
+   überlebt das.
+
+   Farbwahl
+   --------
+   Zwei Farben stellt die Redaktion je Block ein, aus der CD-Palette
+   oder frei. Sie kommen als --v-akzent und --v-knopf inline vom
+   Block; hier werden sie nur auf Plyrs Variablen verteilt.
+
+   Die Voreinstellung folgt dem dunklen Verlauf, auf dem die
+   Bedienleiste liegt — Pfadiblau wäre dort als Strich kaum zu sehen
+   (1,4:1 gegen Schwarz):
+
+     · Großer Abspielknopf   Pfadiblau, Symbol weiß   10,15:1 ✅ AAA
+     · Fortschritt & Fokus   Wölflingsgelb            15,9:1  ✅ AAA
+     · Symbole und Zeit      Weiß                     ~15:1   ✅ AAA
+     · Untertitel            Kohte-Schwarz, Text weiß 15,6:1  ✅ AAA
+
+   Zu jeder Fläche gehört ein --v-…-symbol: die Farbe, die darauf
+   lesbar bleibt. Sie steht nicht hier, sondern wird im Block
+   ausgerechnet — ob Weiß oder Schwarz gewinnt, hängt an der
+   gewählten Farbe, und das kann CSS nicht entscheiden.
+
+   Der Akzent ist zugleich der Fokusring, der Spieler bleibt also
+   auch beim Durchtabben erkennbar ✅ WCAG 2.4.7
+   ============================================================ */
+
+.v-video {
+  margin: var(--sp-8) 0;
+
+  /* Die vier Farbwerte des Blocks. Der Block überschreibt sie inline
+     mit dem, was in der Maske gewählt wurde; hier stehen sie, damit
+     ein Spieler auch ohne gesetzte Werte richtig aussieht — etwa in
+     einer alten Blockfassung von vor der Farbauswahl. */
+  --v-akzent: var(--bdp-gelb);
+  --v-akzent-symbol: var(--bdp-kohte);
+  --v-knopf: var(--bdp-blau);
+  --v-knopf-symbol: var(--bdp-weiss);
+}
+
+.v-video--schmal { max-width: 32rem; }
+.v-video--breit  { margin-inline: calc(var(--sp-8) * -1); }
+
+@media (max-width: 700px) {
+  .v-video--breit { margin-inline: 0; }
+}
+
+/* Hält den Platz, bis Plyr steht. Ohne das springt die
+   Bildunterschrift beim Aufbau der Seite nach unten. */
+.v-video__buehne {
+  position: relative;
+  background: var(--bdp-kohte);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.v-video__spieler {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.v-video__text {
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-klein);
+  line-height: 1.45;
+  color: var(--c-text-leise);
+}
+
+.v-video__notnagel {
+  padding: var(--sp-4);
+  color: var(--c-text-invers);
+}
+
+.v-video__leer {
+  padding: var(--sp-4);
+  border: 2px dashed var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+
+/* ---------- Plyr auf das CD einstellen ---------- */
+.v-video .plyr {
+  --plyr-color-main: var(--v-knopf);
+
+  --plyr-font-family: var(--font-basis);
+  --plyr-font-size-base: 15px;
+  --plyr-font-size-small: 13px;
+  --plyr-font-size-menu: 15px;
+  --plyr-font-size-time: 14px;
+  --plyr-font-weight-regular: 500;
+  --plyr-line-height: 1.45;
+
+  --plyr-video-background: var(--bdp-kohte);
+  --plyr-video-control-color: var(--bdp-weiss);
+  --plyr-video-control-color-hover: var(--v-akzent-symbol);
+  --plyr-video-control-background-hover: var(--v-akzent);
+
+  /* Der Verlauf unter der Leiste in Kluftblau statt in Grau. */
+  --plyr-video-controls-background:
+    linear-gradient(rgba(11, 35, 65, 0), rgba(11, 35, 65, .85));
+
+  --plyr-range-fill-background: var(--v-akzent);
+  --plyr-range-thumb-background: var(--v-akzent);
+  --plyr-range-thumb-height: 14px;
+  --plyr-range-track-height: 6px;
+  --plyr-range-thumb-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+  --plyr-video-range-track-background: rgba(255, 255, 255, .25);
+  --plyr-video-progress-buffered-background: rgba(255, 255, 255, .45);
+
+  --plyr-tooltip-background: var(--bdp-blau-dunkel);
+  --plyr-tooltip-color: var(--bdp-weiss);
+  --plyr-tooltip-radius: 6px;
+
+  --plyr-menu-background: var(--bdp-weiss);
+  --plyr-menu-color: var(--c-text);
+  --plyr-menu-radius: 8px;
+  --plyr-menu-arrow-color: var(--c-text-leise);
+
+  --plyr-captions-background: rgba(34, 36, 35, .85);
+  --plyr-captions-text-color: var(--bdp-weiss);
+
+  --plyr-badge-background: var(--bdp-blau);
+  --plyr-badge-text-color: var(--bdp-weiss);
+  --plyr-badge-border-radius: 4px;
+
+  --plyr-control-radius: 6px;
+  --plyr-control-spacing: 12px;
+  --plyr-control-icon-size: 19px;
+
+  --plyr-focus-visible-color: var(--v-akzent);
+
+  border-radius: var(--radius);
+}
+
+/* Der große Abspielknopf. Beim Überfahren wechselt er auf die
+   Akzentfarbe — dieselbe Umkehr wie bei den Knöpfen des Themes.
+
+   Die Farbe des Pfeils kommt nicht aus dem Stylesheet, sondern vom
+   Block: Er rechnet zu jeder Fläche aus, ob Weiß oder Schwarz darauf
+   lesbar ist. Ein fester weißer Pfeil verschwände auf einem gelben
+   Knopf (1,6:1) ✅ WCAG 1.4.11 */
+.v-video .plyr__control--overlaid {
+  background: var(--v-knopf);
+  color: var(--v-knopf-symbol);
+  border: 3px solid var(--bdp-weiss);
+  padding: var(--sp-4);
+}
+.v-video .plyr__control--overlaid:hover,
+.v-video .plyr__control--overlaid:focus-visible {
+  background: var(--v-akzent);
+  color: var(--v-akzent-symbol);
+}
+
+/* Der Fokusring des Themes ist drei Pixel voll, nicht zwei Pixel
+   gestrichelt wie bei Plyr. Die zusätzliche Klasse .plyr im Selektor
+   ist nötig: Plyrs eigene Regel hängt an .plyr--full-ui.plyr--video
+   und läge sonst gleichauf — bei gleicher Spezifität gewinnt die
+   später geladene Datei, und das ist plyr.css. */
+.v-video .plyr.plyr--video .plyr__control:focus-visible,
+.v-video .plyr.plyr--video .plyr__control--overlaid:focus-visible,
+.v-video .plyr.plyr--video .plyr__control:focus-visible::-webkit-slider-runnable-track {
+  outline: 3px solid var(--v-akzent);
+  outline-offset: 2px;
+}
+
+/* Untertitel dürfen nicht mitschrumpfen, bis sie unlesbar sind.
+   Plyr rechnet sie relativ zur Spielerbreite; auf einem schmalen
+   Telefon landet man sonst bei 11 px. */
+.v-video .plyr__captions {
+  font-size: clamp(1rem, 2.2vw, 1.375rem);
+}
+
+
+/* ============================================================
+   02 Fotogalerie
+   ------------------------------------------------------------
+   Ein Raster mit fester Spaltenbreite und quadratischen Zeilen.
+   Ein Stück belegt je nach Motiv eine oder zwei Spalten und ein
+   oder zwei Zeilen; grid-auto-flow: dense zieht spätere, kleine
+   Stücke vor und füllt damit die Löcher, die die großen reißen.
+
+   Warum feste Zeilenhöhe und object-fit statt „Bild bestimmt die
+   Höhe“: Nur so lassen sich Lücken überhaupt vermeiden. Ein echtes
+   Mauerwerk-Layout (jede Spalte für sich, Bilder in Originalhöhe)
+   hat immer eine ungleich lange letzte Zeile.
+   ============================================================ */
+
+.v-galerie {
+  --spalte: 320px;
+  --zeile: 220px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--spalte), 1fr));
+  grid-auto-rows: var(--zeile);
+  grid-auto-flow: dense;
+  gap: var(--sp-3);
+  margin: var(--sp-8) 0;
+}
+
+/* Deutlich größer als zuvor (220 × 150). Bei 1200 px Container sind das
+   drei statt fünf Spalten — gewollt: Auf einem Foto von 220 px erkennt
+   man die Leute nicht, um die es geht. Wer viele kleine Vorschauen
+   will, stellt den Block auf „Klein“. */
+.v-galerie--schmal { --spalte: 220px; --zeile: 150px; }
+.v-galerie--weit   { --spalte: 440px; --zeile: 300px; }
+
+.v-galerie__stueck {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: var(--c-bg-gedaempft);
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.v-galerie__stueck--breit { grid-column: span 2; }
+.v-galerie__stueck--hoch  { grid-row: span 2; }
+.v-galerie__stueck--gross { grid-column: span 2; grid-row: span 2; }
+
+/* Auf schmalen Schirmen gibt es oft nur zwei Spalten. Ein Stück über
+   zwei Spalten wäre dann die ganze Breite — das ist gewollt, aber ein
+   „gross“ zusätzlich über zwei Zeilen wird zum Klotz. */
+@media (max-width: 700px) {
+  .v-galerie { --spalte: 200px; --zeile: 150px; }
+}
+@media (max-width: 560px) {
+  /* Auf dem Telefon zwei Spalten, sonst wird jedes Bild zur Briefmarke */
+  .v-galerie { --spalte: 150px; --zeile: 120px; }
+  .v-galerie__stueck--gross { grid-row: span 1; }
+}
+
+.v-galerie__stueck img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--zeit-mittel) var(--kurve);
+}
+
+.v-galerie__lupe {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.v-galerie__lupe:hover img,
+.v-galerie__lupe:focus-visible img { transform: scale(1.04); }
+
+@media (prefers-reduced-motion: reduce) {
+  .v-galerie__stueck img { transition: none; }
+  .v-galerie__lupe:hover img { transform: none; }
+}
+
+.v-galerie__leer {
+  padding: var(--sp-6);
+  border: 2px dashed var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+
+/* --- Info-Kästchen ------------------------------------------------
+   Gehört zu diesem Block und zu keinem anderen. Vorher rüstete das
+   Theme jede Figur auf der ganzen Website damit aus; auf Textseiten
+   war das im Weg. Hier ist es der Punkt.
+
+   Ohne JavaScript bleibt das figcaption sichtbar unter dem Bild
+   stehen: alles, was es zum Kästchen macht, hängt an der Klasse
+   .ist-bereit, die nur das Skript setzt ✅
+   ------------------------------------------------------------------ */
+
+.v-galerie__stueck figcaption {
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-klein);
+  line-height: 1.5;
+  color: var(--c-text-leise);
+}
+.v-galerie__stueck figcaption strong {
+  display: block;
+  color: var(--bdp-blau);
+}
+
+/* --- ab hier: nur, wenn das Skript den Schalter aufgebaut hat --- */
+
+.v-galerie__stueck.ist-bereit figcaption {
+  position: absolute;
+  left: var(--sp-2);
+  right: var(--sp-2);
+  bottom: var(--sp-2);
+  z-index: 2;
+  margin: 0;
+  max-height: min(70%, 13rem);
+  overflow-y: auto;
+  /* Keine Rundung: die Kanten des CD sind gerade. Statt eines
+     Farbbalkens links trägt die gestrichelte CD-Linie oben. */
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(6px);
+  color: var(--c-text);
+  box-shadow: var(--schatten-karte);
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 12px, transparent 12px 20px);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 3px;
+  padding-top: calc(var(--sp-3) + 3px);
+  opacity: 0;
+  transform: translateY(8px);
+  /* visibility verzögert ausblenden, damit die Bewegung sichtbar
+     bleibt; beim Einblenden sofort. */
+  visibility: hidden;
+  transition: opacity var(--zeit-mittel) var(--kurve),
+              transform var(--zeit-mittel) var(--kurve),
+              visibility 0s linear var(--zeit-mittel);
+}
+.v-galerie__stueck.ist-bereit figcaption[data-offen="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Der Schalter — 44 × 44 px Zielfläche ✅ WCAG 2.5.5 */
+.v-galerie__info {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bdp-blau);
+  color: var(--bdp-gelb);            /* 7,00:1 ✅ */
+  font-family: var(--font-basis);
+  font-weight: 900;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(11, 35, 65, .34);
+  transition: background var(--zeit-kurz) var(--kurve),
+              transform  var(--zeit-kurz) var(--kurve),
+              opacity    var(--zeit-mittel) var(--kurve);
+}
+.v-galerie__info:hover { background: var(--bdp-blau-dunkel); transform: scale(1.08); }
+.v-galerie__info[aria-expanded="true"] {
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+}
+.v-galerie__info[aria-expanded="true"] .v-galerie__info-zeichen::before { content: "×"; }
+.v-galerie__info[aria-expanded="true"] .v-galerie__info-zeichen { font-size: 0; }
+.v-galerie__info[aria-expanded="true"] .v-galerie__info-zeichen::before { font-size: 1.4rem; }
+
+/* Der Schalter zeigt sich nur auf Zuruf.
+
+   Bewusst opacity und pointer-events statt display oder visibility:
+   Beide nähmen den Knopf aus der Tabfolge, dann könnte :focus-within
+   nie auslösen und der Knopf wäre per Tastatur unerreichbar. Mit
+   opacity: 0 bleibt er fokussierbar und holt sich über :focus-within
+   die Sichtbarkeit zurück. */
+.v-galerie__stueck.ist-bereit .v-galerie__info {
+  opacity: 0;
+  pointer-events: none;
+}
+.v-galerie__stueck.ist-bereit:hover .v-galerie__info,
+.v-galerie__stueck.ist-bereit:focus-within .v-galerie__info,
+.v-galerie__stueck.ist-bereit .v-galerie__info[aria-expanded="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Geräte ohne Zeiger können nicht überfahren. Dort steht der Schalter
+   dauerhaft da, sonst käme man nie an die Bildinformationen. */
+@media (hover: none) {
+  .v-galerie__stueck.ist-bereit .v-galerie__info {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-galerie__stueck.ist-bereit figcaption { transition: none; }
+}
+
+/* --- Großansicht --------------------------------------------------
+   Ein <dialog>: Escape, Fokusfalle und Hintergrund-Inertheit bringt
+   der Browser mit ✅ WCAG 2.1.2 */
+.v-lupe {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: 96vw;
+  max-height: 96vh;
+  overflow: visible;
+}
+.v-lupe::backdrop { background: rgba(11, 35, 65, .92); }
+
+.v-lupe__bild {
+  display: block;
+  max-width: 96vw;
+  max-height: 84vh;
+  width: auto;
+  height: auto;
+}
+
+.v-lupe__text {
+  color: var(--bdp-weiss);
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-klein);
+  text-align: center;
+}
+
+.v-lupe__zu,
+.v-lupe__blaettern {
+  position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  border: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.v-lupe__zu { top: calc(var(--sp-6) * -1); right: 0; }
+.v-lupe__blaettern--zurueck { left: calc(var(--sp-8) * -1); top: 50%; transform: translateY(-50%); }
+.v-lupe__blaettern--vor     { right: calc(var(--sp-8) * -1); top: 50%; transform: translateY(-50%); }
+
+@media (max-width: 700px) {
+  .v-lupe__blaettern--zurueck { left: 0; }
+  .v-lupe__blaettern--vor { right: 0; }
+}
+
+
+/* ============================================================
+   03 Kämmerei
+   ============================================================ */
+
+.v-waren {
+  list-style: none;
+  margin: 0 0 var(--sp-12);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-6);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+}
+
+.v-ware {
+  display: flex;
+  flex-direction: column;
+  background: var(--c-bg-gedaempft);
+  /* Keine Rundung: die Kanten des CD sind gerade. */
+  border-top: 4px solid var(--bdp-blau);
+}
+.v-ware--gebraucht { border-top-color: var(--bdp-rot); }
+
+.v-ware__bild {
+  aspect-ratio: 4 / 3;
+  background: var(--bdp-weiss);
+  overflow: hidden;
+}
+.v-ware__bild img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Platzhalter, wenn kein Bild hinterlegt ist: das Sechseck des
+   Stammeslogos, blass. Hält die Karte auf gleicher Höhe. */
+.v-ware__ersatz {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(var(--c-bg-gedaempft), var(--c-bg-gedaempft)) padding-box;
+  position: relative;
+}
+.v-ware__ersatz::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  height: 48px;
+  background: var(--bdp-blau-hell);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.v-ware__text {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: var(--sp-2);
+}
+
+.v-ware__name {
+  margin: 0;
+  font-size: var(--fs-h6);
+  line-height: 1.3;
+  color: var(--bdp-blau);
+}
+
+.v-etikett--gebraucht {
+  align-self: flex-start;
+  background: var(--bdp-rot);
+  color: var(--bdp-weiss);          /* 8,35:1 ✅ */
+}
+
+.v-ware__info,
+.v-ware__hinweis {
+  margin: 0;
+  font-size: var(--fs-klein);
+  line-height: 1.5;
+}
+.v-ware__hinweis { color: var(--c-text-leise); }
+
+.v-ware__fuss {
+  margin-top: auto;
+  padding-top: var(--sp-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.v-ware__preis {
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+
+.v-ware__bestellen {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  color: var(--bdp-blau);
+  text-decoration: none;
+  border-bottom: 2px solid var(--bdp-gelb);
+}
+.v-ware__bestellen:hover { border-bottom-width: 4px; }
+
+
+/* ============================================================
+   04 Aufnahmeantrag
+   ============================================================ */
+
+.v-antrag { margin: var(--sp-8) 0; }
+
+/* --- Schrittleiste ------------------------------------------------
+   Waagerecht, mit einer durchgehenden gestrichelten Linie dahinter:
+   dieselbe CD-Linie wie überall, hier als Weg gelesen. */
+.v-antrag__leiste {
+  list-style: none;
+  margin: 0 0 var(--sp-8);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  counter-reset: schritt;
+}
+
+.v-antrag__marke { flex: 1 1 auto; min-width: 0; }
+
+.v-antrag__marke-knopf {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  min-height: 44px;               /* Zielfläche ✅ */
+  padding: var(--sp-2);
+  background: none;
+  border: 0;
+  border-top: 4px solid var(--c-rahmen);
+  color: var(--c-text-leise);
+  font: inherit;
+  font-size: var(--fs-winzig);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--zeit-kurz) var(--kurve),
+              color var(--zeit-kurz) var(--kurve);
+}
+.v-antrag__marke-knopf:hover { color: var(--bdp-blau); }
+
+/* Erledigt und aktuell unterscheiden sich in der Farbe des Balkens.
+   Damit Farbe nicht allein die Information trägt, wechselt bei der
+   aktuellen Marke zusätzlich das Gewicht ✅ WCAG 1.4.1 */
+.v-antrag__marke-knopf[aria-current="step"] {
+  border-top-color: var(--bdp-blau);
+  color: var(--bdp-blau);
+  font-weight: 700;
+}
+.v-antrag__marke-knopf.ist-erledigt { border-top-color: var(--bdp-gelb); }
+
+.v-antrag__marke-zahl {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  color: var(--c-rahmen);
+  font-size: 0;
+}
+.v-antrag__marke-knopf[aria-current="step"] .v-antrag__marke-zahl { color: var(--bdp-blau); }
+.v-antrag__marke-knopf.ist-erledigt .v-antrag__marke-zahl { color: var(--bdp-gelb); }
+
+.v-antrag__marke-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  /* Auf dem Telefon nur noch die Sechsecke: sieben Wörter je Marke
+     nebeneinander gehen dort nicht. Der Text bleibt für Screenreader
+     im Dokument. */
+  .v-antrag__marke { flex: 0 0 auto; }
+  .v-antrag__marke-text {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .v-antrag__marke-knopf { justify-content: center; }
+}
+
+.v-antrag__stand {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+/* --- Ein Schritt -------------------------------------------------- */
+.v-antrag__schritt { position: relative; }
+
+/* Solange JavaScript läuft, steht nur ein Schritt. Ohne JavaScript
+   stehen alle untereinander — dann ist die Klasse nie gesetzt. */
+.v-antrag__schritt.ist-versteckt { display: none; }
+
+.v-antrag__titel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+}
+
+.v-antrag__zahl {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 50px;
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);          /* 7,00:1 ✅ */
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  font-size: var(--fs-h5);
+  font-weight: 700;
+}
+
+.v-antrag__text { max-width: var(--container-text); }
+.v-antrag__text > :last-child { margin-bottom: 0; }
+
+.v-antrag__bild {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: var(--sp-6) 0;
+}
+
+/* Eingebettetes Formular. Die Höhe ist großzügig: Microsoft Forms
+   scrollt intern, aber ein 300 px hohes Fenster für ein Formular mit
+   zehn Feldern ist eine Zumutung. */
+.v-antrag__formular {
+  display: block;
+  width: 100%;
+  max-width: 46rem;
+  height: min(70vh, 640px);
+  margin: var(--sp-6) 0;
+  border: 1px solid var(--c-rahmen);
+  background: var(--c-bg-gedaempft);
+}
+
+.v-antrag__tat { margin: var(--sp-6) 0; }
+
+.v-antrag__blaettern {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-6);
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-blau) 0 16px, transparent 16px 26px);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 3px;
+}
+
+/* --- Konfetti ------------------------------------------------------
+   Ein Overlay über der ganzen Seite, kein Streifen im Block.
+
+   Aufbau je Schnipsel: zwei ineinandergeschachtelte Elemente. Das
+   äußere übernimmt die waagerechte Strecke (gleichmäßig), das innere
+   die senkrechte samt Drehung. Erst diese Trennung ergibt einen Bogen
+   — mit einem einzigen Element bekäme man nur eine Gerade, und
+   Konfetti, das schnurgerade fliegt, sieht nach Bildschirmschoner aus.
+
+   Die Werte kommen als CSS-Variablen aus bloecke.js, damit jeder
+   Schnipsel eine eigene Richtung, Drehung, Dauer und Verzögerung hat.
+
+   Das Overlay wird nach der Animation aus dem Dokument entfernt. Es
+   hört danach niemandem mehr zu und liegt nicht über der Seite herum.
+   ------------------------------------------------------------------ */
+.v-konfetti {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  pointer-events: none;   /* nichts davon darf Klicks abfangen */
+}
+
+.v-konfetti i {
+  position: absolute;
+  left: var(--start-x);
+  top: var(--start-y);
+  display: block;
+  animation: v-konfetti-quer var(--dauer) linear var(--verzug) forwards;
+}
+
+.v-konfetti i > span {
+  display: block;
+  width: var(--breite);
+  height: var(--hoehe);
+  background: var(--farbe);
+  border-radius: var(--rundung);
+  animation: v-konfetti-hoch var(--dauer) cubic-bezier(.28, .62, .5, 1) var(--verzug) forwards;
+}
+
+@keyframes v-konfetti-quer {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--weg-x)); }
+}
+
+@keyframes v-konfetti-hoch {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  6%   { opacity: 1; }
+  /* Der Scheitel des Bogens. Bei Schnipseln, die von oben fallen,
+     setzt das Skript --gipfel auf 0 — dann fällt die Kurve schlicht
+     durch. */
+  38%  { transform: translateY(var(--gipfel)) rotate(calc(var(--dreh) * .38)); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(var(--weg-y)) rotate(var(--dreh)); }
+}
+
+/* Bei „Bewegung reduzieren“ wird das Overlay gar nicht erst gebaut,
+   siehe bloecke.js. Die Regel hier ist der Gürtel zum Hosenträger. */
+@media (prefers-reduced-motion: reduce) {
+  .v-konfetti { display: none; }
+}
+
+
+/* --- Bestätigungsfenster ------------------------------------------ */
+.v-antrag__frage {
+  border: 0;
+  border-top: 6px solid var(--bdp-gelb);
+  padding: var(--sp-8);
+  max-width: min(38rem, 92vw);
+  background: var(--bdp-weiss);
+  color: var(--c-text);
+}
+.v-antrag__frage::backdrop { background: rgba(11, 35, 65, .7); }
+
+.v-antrag__frage-titel {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-h4);
+  color: var(--bdp-blau);
+}
+
+.v-antrag__frage-text > :last-child { margin-bottom: 0; }
+
+.v-antrag__frage-wohin {
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3);
+  background: var(--c-bg-gedaempft);
+  font-size: var(--fs-klein);
+  overflow-wrap: anywhere;
+}
+
+.v-antrag__frage-knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+
+/* ============================================================
+   05 Kalender
+   ============================================================ */
+
+.v-kal { margin: var(--sp-8) 0; }
+
+.v-kal__kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+/* --- Ansichtsumschalter ------------------------------------------- */
+.v-kal__ansichten { display: flex; flex-wrap: wrap; gap: 2px; }
+
+.v-kal__ansicht {
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border: 2px solid var(--bdp-blau);
+  background: var(--bdp-weiss);
+  color: var(--bdp-blau);
+  font: inherit;
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  cursor: pointer;
+}
+.v-kal__ansicht[aria-pressed="true"] {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);          /* 10,15:1 ✅ */
+}
+
+/* --- Vor und zurück ------------------------------------------------ */
+.v-kal__steuer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.v-kal__zeitraum {
+  min-width: 11ch;
+  text-align: center;
+  color: var(--bdp-blau);
+}
+
+.v-kal__blaettern {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--bdp-blau);
+  background: var(--bdp-weiss);
+  cursor: pointer;
+}
+
+/* Der Pfeil ist ein gedrehtes Winkelstück und kein Schriftzeichen.
+   Zeichen wie ‹ und › sitzen in ihrer Laufweite nicht mittig; als
+   Rahmen gezeichnet stimmt die Mitte immer. */
+.v-kal__blaettern > span {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-right: 3px solid var(--bdp-blau);
+  border-bottom: 3px solid var(--bdp-blau);
+}
+[data-kal-zurueck] > span { transform: rotate(135deg); margin-left: 3px; }
+[data-kal-vor] > span     { transform: rotate(-45deg); margin-right: 3px; }
+
+.v-kal__heute {
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 0;
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* --- Legende ------------------------------------------------------- */
+.v-kal__legende {
+  list-style: none;
+  margin: 0 0 var(--sp-6);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-6);
+  font-size: var(--fs-klein);
+}
+.v-kal__legende li { display: flex; align-items: center; gap: var(--sp-2); }
+
+.v-kal__punkt {
+  width: 14px;
+  height: 14px;
+  background: var(--stufe, var(--bdp-blau));
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+/* Sechseck-Feature: nur wenn explizit aktiviert */
+[data-kal-sechseck] .v-kal__punkt {
+  height: 16px;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.v-kal__punkt--frei {
+  background: repeating-linear-gradient(
+    45deg, var(--bdp-blau-hell) 0 3px, transparent 3px 6px);
+  clip-path: none;
+  border: 1px solid var(--bdp-blau-hell);
+}
+
+/* --- Monatsraster --------------------------------------------------
+   Sieben Spalten, feste Mindesthöhe. Mehrtägige Termine liegen als
+   durchgehender Balken über die Woche; das übernimmt kalender.js,
+   weil sich die Länge erst aus dem Datum ergibt.
+   ------------------------------------------------------------------ */
+.v-kal__monat {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--c-rahmen);
+  border: 1px solid var(--c-rahmen);
+}
+
+.v-kal__wochentag {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+  padding: var(--sp-2);
+  font-size: var(--fs-winzig);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.v-kal__tag {
+  background: var(--bdp-weiss);
+  min-height: 104px;
+  padding: var(--sp-1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.v-kal__tag--fremd { background: var(--c-bg-gedaempft); }
+.v-kal__tag--heute { outline: 3px solid var(--bdp-gelb); outline-offset: -3px; }
+
+/* Schulfreie Tage liegen als Schraffur hinter dem Tag. Als Fläche
+   wären sie eine fünfte Farbe und würden mit den Stufen
+   konkurrieren.
+
+   Drei Abstufungen für drei verschiedene Dinge: Das Wochenende ist
+   jede Woche und darf leise sein, Ferien dauern Wochen, ein
+   Feiertag ist ein einzelner Tag — und steht zusätzlich mit Namen
+   im Kalender, siehe .v-kal__frei. */
+.v-kal__tag--wochenende { background: var(--c-bg-gedaempft); }
+.v-kal__tag--ferien {
+  background-image: repeating-linear-gradient(
+    45deg, rgba(169, 187, 206, .5) 0 4px, transparent 4px 9px);
+}
+/* Neutrales Grau und Gegenrichtung statt Gelb: Gelb gehört der
+   Wölflingsstufe. Ferien und Feiertag unterscheiden sich jetzt an
+   der Richtung der Schraffur, nicht an der Farbe — beide Muster
+   bleiben damit außerhalb der vier Stufenfarben. */
+.v-kal__tag--feiertag {
+  background-image: repeating-linear-gradient(
+    -45deg, rgba(85, 89, 91, .22) 0 4px, transparent 4px 9px);
+}
+/* Tage aus dem Vor- oder Folgemonat bleiben zurückhaltend, auch
+   wenn sie frei sind. */
+.v-kal__tag--fremd.v-kal__tag--wochenende { background: #eceff2; }
+
+.v-kal__zahl {
+  font-size: var(--fs-winzig);
+  font-weight: 700;
+  color: var(--c-text-leise);
+  padding: 2px;
+}
+.v-kal__tag--heute .v-kal__zahl { color: var(--bdp-blau); }
+
+/* Der Titel darf abgeschnitten werden, die Tageszählung nicht.
+
+   Deshalb eine Flex-Zeile statt eines einfachen Blocks mit
+   text-overflow: Vorher fraß ein langer Titel wie „Kurs für
+   Meutenführungen“ die ganze Zelle und das „(3/5)“ dahinter war
+   weggeschnitten — also genau die Angabe, die man in der Zelle
+   sucht. Jetzt schrumpft der Titel und die Zählung bleibt. */
+.v-kal__marke {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-left: 4px solid var(--stufe, var(--bdp-blau));
+  background: var(--c-bg-gedaempft);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-winzig);
+  line-height: 1.3;
+  padding: 3px 4px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.v-kal__marke > :first-child {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v-kal__marke:hover { background: var(--bdp-blau-hell); }
+
+/* Bei mehrtägigen Terminen der wievielte Tag. Kleiner und blasser
+   als der Titel: Es ist eine Fußnote, keine zweite Überschrift. */
+.v-kal__marke-nr {
+  flex: 0 0 auto;
+  color: var(--c-text-leise);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Der Feiertag steht als eigener Eintrag im Tag, nicht nur als
+   Schraffur. Ein Muster sagt „hier ist etwas“, aber nicht was — und
+   ob der 3. Oktober oder Fronleichnam frei ist, macht fürs Planen
+   einen Unterschied.
+
+   Er sieht aber ausdrücklich nicht aus wie ein Termin.
+   ------------------------------------------------------------------
+   Vorher trug er die Form der Terminmarke: farbiger Balken links,
+   eigene Fläche. Der Balken war gelb — und Gelb ist in diesem
+   Kalender die Wölflingsstufe. Feiertage lasen sich damit als
+   Meutentermine.
+
+   Deshalb keine Fläche, kein Balken, keine Farbe, die einer Stufe
+   gehört: nur grauer Kursivtext. Das liest sich als Anmerkung zum
+   Tag, und genau das ist es. */
+.v-kal__frei {
+  display: block;
+  width: 100%;
+  padding: 2px 4px 2px 0;
+  /* Kohte und nicht das gedeckte Grau: Der Eintrag liegt auf der
+     Schraffur des freien Tages, und Grau auf Grau kam nur auf 2,9:1.
+     Kursiv und ohne Balken sagt schon deutlich genug, dass das kein
+     Termin ist — dafür muss der Text nicht auch noch blass sein.
+     Kohte auf der Schraffur: 8,4:1 ✅ AAA */
+  color: var(--c-text);
+  font-size: var(--fs-winzig);
+  font-style: italic;
+  line-height: 1.3;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.v-kal__mehrmarke {
+  border: 0;
+  background: none;
+  color: var(--bdp-blau);
+  font: inherit;
+  font-size: var(--fs-winzig);
+  font-weight: 700;
+  text-align: left;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+/* --- Halbjahr und Jahr: Monate als Spalten -------------------------
+   Jeder Monat ist eine senkrechte Liste seiner Tage: links Zahl und
+   Wochentag, rechts die Terminkästen. Ein mehrtägiger Termin ist ein
+   Kasten über mehrere Zeilen.
+
+   Warum nicht das Monatsraster in klein: In sieben Spalten mit fünf
+   Zeilen ist ein Lager vom 31. Juli bis 9. August in vier Stücke
+   zerschnitten, und man sieht die Dauer nicht. In der Tagesliste ist
+   es ein Balken, dessen Länge die Dauer ist.
+
+   Die Zahl der Monate nebeneinander steht in --spalten und wird von
+   kalender.js aus der verfügbaren Breite berechnet: 1, 2, 3, 4, 6
+   oder 12, alles Teiler von 12, damit die Zeilen aufgehen.
+   ------------------------------------------------------------------ */
+
+/* Der Jahresüberblick sprengt den Container.
+
+   Zwölf Monate nebeneinander brauchen Platz: In den 1200 px des
+   Lesecontainers wären das 100 px je Monat, davon 50 px für Tageszahl
+   und Wochentag — es bliebe nichts. Deshalb nimmt sich diese eine
+   Ansicht die volle Fensterbreite.
+
+   Die Rechnung: Das Element wird so breit wie das Fenster (abzüglich
+   Rand) und dann um seinen halben Überstand nach links gezogen. 50 %
+   bezieht sich auf den Container, und da der mittig sitzt, trifft das
+   die Fenstermitte. Der Abzug von 2 rem hält Abstand zur
+   Bildlaufleiste — mit vollen 100vw entstünde auf Systemen mit
+   sichtbarer Leiste ein waagerechter Überlauf. */
+.v-kal__monate {
+  --breitbild: min(calc(100vw - 2rem), 2200px);
+
+  width: var(--breitbild);
+  margin-inline: calc(50% - var(--breitbild) / 2);
+
+  display: grid;
+  grid-template-columns: repeat(var(--spalten, 3), minmax(0, 1fr));
+  gap: var(--sp-6) var(--sp-4);
+  align-items: start;
+}
+
+.v-kal__monatstitel {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-h6);
+  color: var(--bdp-blau);
+  position: sticky;
+  top: 0;
+  background: var(--c-bg);
+  padding-bottom: 2px;
+  z-index: 2;
+}
+
+/* Erste Spalte: Tageszahl und Wochentag. Danach je eine Spalte für
+   jede Spur nebeneinanderliegender Termine — die Zahl setzt
+   kalender.js in --spuren. */
+.v-kal__tageraster {
+  --zeilenhoehe: 1.45rem;
+
+  display: grid;
+  grid-template-columns: 3.1rem repeat(var(--spuren, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--tage, 31), var(--zeilenhoehe));
+  gap: 1px;
+  background: var(--c-rahmen);
+  border: 1px solid var(--c-rahmen);
+}
+
+/* Die Tageszeile liegt unter den Terminkästen und über die volle
+   Breite: Sie trägt den Hintergrund für schulfreie Tage und die
+   Markierung für heute. Die Kästen kommen im Markup danach und
+   liegen deshalb darüber. */
+.v-kal__tagzeile {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding-left: 4px;
+  background: var(--bdp-weiss);
+  font-size: var(--fs-winzig);
+  line-height: 1;
+  color: var(--c-text-leise);
+}
+
+.v-kal__tagnr {
+  min-width: 1.4em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.v-kal__tagwt { opacity: .7; }
+
+/* Schulfrei. Drei Abstufungen, weil drei verschiedene Dinge gemeint
+   sind: Wochenende ist jede Woche, Ferien dauern Wochen, ein
+   Feiertag ist ein einzelner Tag und steht zusätzlich als Eintrag
+   im Kalender.
+
+   Die Schraffur statt einer Fläche ist Absicht: Eine fünfte Farbe
+   würde mit den vier Stufenfarben konkurrieren. */
+.v-kal__tagzeile--wochenende { background: var(--c-bg-gedaempft); }
+.v-kal__tagzeile--ferien {
+  background-image: repeating-linear-gradient(
+    45deg, rgba(169, 187, 206, .55) 0 4px, transparent 4px 9px);
+}
+.v-kal__tagzeile--feiertag {
+  background-image: repeating-linear-gradient(
+    -45deg, rgba(85, 89, 91, .22) 0 4px, transparent 4px 9px);
+}
+
+.v-kal__tagzeile--heute {
+  outline: 2px solid var(--bdp-gelb);
+  outline-offset: -2px;
+  color: var(--bdp-blau);
+  font-weight: 700;
+  z-index: 1;
+}
+
+/* Der Terminkasten. Die Höhe ergibt sich aus grid-row, die
+   kalender.js setzt — ein Termin über acht Tage ist acht Zeilen
+   hoch. */
+.v-kal__balken {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  margin: 1px;
+  padding: 2px 4px;
+  border: 0;
+  border-left: 3px solid var(--stufe, var(--bdp-blau));
+  background: color-mix(in srgb, var(--stufe, #0E4278) 16%, white);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-winzig);
+  line-height: 1.15;
+  text-align: left;
+  cursor: pointer;
+}
+.v-kal__balken:hover {
+  background: color-mix(in srgb, var(--stufe, #0E4278) 30%, white);
+}
+
+/* Browser ohne color-mix bekommen eine schlichte helle Fläche.
+   Der farbige Balken links trägt die Stufe ohnehin. */
+@supports not (background: color-mix(in srgb, red 50%, white)) {
+  .v-kal__balken { background: var(--c-bg-gedaempft); }
+}
+
+.v-kal__balken-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* Läuft der Termin über den Monatsrand hinaus, bleibt die Kante
+   offen und ein kleiner Pfeil zeigt die Richtung. Ohne das sähe ein
+   Sommerlager wie zwei getrennte Lager aus. */
+.v-kal__balken--vorher {
+  border-top: 2px dashed var(--stufe, var(--bdp-blau));
+  padding-top: 0;
+}
+.v-kal__balken--weiter {
+  border-bottom: 2px dashed var(--stufe, var(--bdp-blau));
+}
+.v-kal__balken--vorher::before,
+.v-kal__balken--weiter::after {
+  position: absolute;
+  right: 3px;
+  font-size: 9px;
+  line-height: 1;
+  color: var(--stufe, var(--bdp-blau));
+}
+.v-kal__balken--vorher::before { content: "▲"; top: 1px; }
+.v-kal__balken--weiter::after  { content: "▼"; bottom: 1px; }
+
+/* --- Terminliste ---------------------------------------------------- */
+.v-kal__liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.v-kal__eintrag {
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-6);
+  background: var(--c-bg-gedaempft);
+  border-left: 6px solid var(--stufe, var(--bdp-blau));
+}
+
+.v-kal__wann {
+  display: block;
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+
+.v-kal__was {
+  margin: var(--sp-1) 0 var(--sp-1);
+  font-size: var(--fs-h6);
+}
+
+.v-kal__stufe {
+  margin: 0;
+  font-size: var(--fs-winzig);
+  color: var(--c-text-leise);
+}
+
+.v-kal__mehr {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-klein);
+}
+
+.v-kal__leer {
+  padding: var(--sp-8);
+  text-align: center;
+  color: var(--c-text-leise);
+  background: var(--c-bg-gedaempft);
+}
+
+/* Vergangenes bleibt in der Liste stehen, aber blass. Wer im
+   September nachsehen will, wann das Sommerlager war, findet es —
+   ohne dass es die kommenden Termine überdeckt.
+
+   Nur die Deckkraft zu senken wäre zu wenig: Der Text muss lesbar
+   bleiben ✅ WCAG 1.4.3. Deshalb bleibt die Schrift dunkel genug,
+   und zurückgenommen wird vor allem die Fläche. */
+.v-kal__eintrag--vorbei {
+  background: transparent;
+  border-left-color: var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+.v-kal__eintrag--vorbei .v-kal__wann,
+.v-kal__eintrag--vorbei .v-kal__was { color: var(--c-text-leise); }
+
+/* Die Trennmarke zwischen Vergangenem und Kommendem. Sie steht nur
+   da, wenn es überhaupt Vergangenes gibt — sonst wäre sie eine
+   Überschrift über der gesamten Liste und sagte nichts. */
+.v-kal__heutemarke {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-2) 0;
+  font-size: var(--fs-klein);
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+.v-kal__heutemarke > span {
+  flex: 0 0 auto;
+  padding: 4px var(--sp-3);
+  background: var(--bdp-gelb);
+  color: var(--bdp-blau);          /* 7,00:1 ✅ */
+}
+.v-kal__heutemarke::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 3px;
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 14px, transparent 14px 22px);
+}
+
+/* --- Terminfenster --------------------------------------------------- */
+.v-kal__fenster {
+  border: 0;
+  border-top: 6px solid var(--stufe, var(--bdp-blau));
+  padding: var(--sp-6);
+  max-width: min(34rem, 92vw);
+  background: var(--bdp-weiss);
+  color: var(--c-text);
+}
+.v-kal__fenster::backdrop { background: rgba(11, 35, 65, .7); }
+
+.v-kal__fenster-titel { margin: 0 0 var(--sp-2); font-size: var(--fs-h4); }
+.v-kal__fenster-wann { font-weight: 700; color: var(--bdp-blau); }
+.v-kal__fenster-zu { margin-top: var(--sp-6); }
+
+/* --- Abo ------------------------------------------------------------- */
+.v-kal__abo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-8);
+}
+.v-kal__abo-hinweis {
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+  max-width: 46ch;
+}
+
+/* ============================================================
+   06 Kontodaten
+   ------------------------------------------------------------
+   IBAN und BIC als Knöpfe, dahinter ein Fenster mit dem
+   GiroCode nach EPC069-12. Der Code enthält Empfänger, IBAN und
+   BIC, aber keinen Betrag — den fragt die Banking-App selbst
+   ab, was für Beiträge und Spenden in wechselnder Höhe genau
+   richtig ist.
+   ============================================================ */
+
+.v-konto { margin: var(--sp-6) 0; }
+
+.v-konto__daten {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+  max-width: 36rem;
+}
+.v-konto__daten > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) 1fr;
+  gap: var(--sp-2) var(--sp-4);
+  align-items: baseline;
+  padding-bottom: var(--sp-2);
+  background-image: repeating-linear-gradient(
+    90deg, var(--c-rahmen) 0 10px, transparent 10px 16px);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+.v-konto__daten dt {
+  font-size: var(--fs-winzig);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 700;
+  color: var(--c-text-leise);
+}
+.v-konto__daten dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* IBAN und BIC sehen aus wie Text und verhalten sich wie Knöpfe.
+   Der gestrichelte Unterstrich sagt „hier ist mehr“, ohne dass es
+   nach Formularfeld aussieht. */
+.v-konto__wert {
+  border: 0;
+  padding: 4px 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--bdp-blau);
+  cursor: pointer;
+  text-align: left;
+  background-image: repeating-linear-gradient(
+    90deg, var(--bdp-gelb) 0 10px, transparent 10px 16px);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 3px;
+}
+.v-konto__wert:hover { color: var(--bdp-blau-dunkel); background-size: 100% 4px; }
+
+.v-konto__tipp {
+  margin: 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+.v-konto__fenster {
+  border: 0;
+  border-top: 6px solid var(--bdp-gelb);
+  padding: var(--sp-8);
+  max-width: min(34rem, 94vw);
+  background: var(--bdp-weiss);
+  color: var(--c-text);
+}
+.v-konto__fenster::backdrop { background: rgba(11, 35, 65, .7); }
+
+.v-konto__fenster-titel {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-h4);
+  color: var(--bdp-blau);
+}
+.v-konto__fenster-text {
+  margin: 0 0 var(--sp-6);
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+/* Der GiroCode steht als SVG direkt im HTML — er wird aus den
+   Feldern des Blocks gerechnet, damit er nicht veralten kann. */
+.v-konto__qr {
+  display: block;
+  width: 220px;
+  margin: 0 auto var(--sp-6);
+  border: 1px solid var(--c-rahmen);
+}
+.v-konto__qr svg { display: block; width: 100%; height: auto; }
+
+.v-konto__titel { margin: 0 0 var(--sp-2); }
+.v-konto__einleitung { margin: 0 0 var(--sp-4); }
+
+.v-konto__zweck {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+.v-konto__leer {
+  padding: var(--sp-4);
+  border: 2px dashed var(--c-rahmen);
+  color: var(--c-text-leise);
+}
+
+.v-konto__daten--fenster > div { grid-template-columns: minmax(5.5rem, auto) 1fr; }
+.v-konto__daten--fenster dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.v-konto__fenster-schluss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-6) 0 0;
+}
+.v-konto__meldung {
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+/* Auf Papier nützt der Knopf nichts, die Daten aber schon. */
+@media print {
+  .v-konto__wert {
+    background: none;
+    color: var(--c-text);
+  }
+  .v-konto__tipp { display: none; }
+}
+
+
+/* --- Abo-Dialog -----------------------------------------------------
+   Drei Wege, eine Datei. Google bekommt die Adresse als Parameter,
+   webcal:// ist derselbe Abruf mit anderem Schema, und die dritte
+   Zeile ist die Adresse zum Kopieren. Es gibt keine zweite
+   Datenhaltung je Anbieter.
+   -------------------------------------------------------------------- */
+.v-kal__abofenster {
+  border: 0;
+  border-top: 6px solid var(--bdp-gelb);
+  padding: var(--sp-8);
+  max-width: min(38rem, 94vw);
+  background: var(--bdp-weiss);
+  color: var(--c-text);
+}
+.v-kal__abofenster::backdrop { background: rgba(11, 35, 65, .7); }
+
+.v-kal__abofenster-titel {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-h4);
+  color: var(--bdp-blau);
+}
+.v-kal__abofenster-text {
+  margin: 0 0 var(--sp-6);
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+.v-kal__abowege {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.v-kal__aboweg {
+  display: block;
+  padding: var(--sp-4);
+  background: var(--c-bg-gedaempft);
+  border-left: 4px solid var(--bdp-blau);
+  color: var(--c-text);
+  text-decoration: none;
+}
+a.v-kal__aboweg:hover,
+a.v-kal__aboweg:focus-visible {
+  background: var(--bdp-blau);
+  color: var(--bdp-weiss);
+}
+a.v-kal__aboweg:hover .v-kal__aboweg-name,
+a.v-kal__aboweg:focus-visible .v-kal__aboweg-name { color: var(--bdp-gelb); }
+a.v-kal__aboweg:hover .v-kal__aboweg-text,
+a.v-kal__aboweg:focus-visible .v-kal__aboweg-text { color: rgba(255, 255, 255, .9); }
+
+.v-kal__aboweg--kopieren { border-left-color: var(--bdp-gelb); }
+
+.v-kal__aboweg-name {
+  display: block;
+  font-weight: 700;
+  color: var(--bdp-blau);
+}
+.v-kal__aboweg-text {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}
+
+.v-kal__abofeld {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-2);
+}
+.v-kal__abofeld input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: var(--sp-2);
+  border: 2px solid var(--c-rahmen);
+  background: var(--bdp-weiss);
+  font: inherit;
+  font-size: var(--fs-klein);
+}
+
+.v-kal__abofenster-schluss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-6) 0 0;
+}
+.v-kal__abomeldung {
+  font-size: var(--fs-klein);
+  color: var(--c-text-leise);
+}

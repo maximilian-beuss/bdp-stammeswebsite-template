@@ -1,0 +1,2 @@
+einfachBdP
+Theme für BdP-Ortsgruppen auf Basis des BdP Corporate Design: Pfadiblau und Wölflingsgelb, Kohtenanschnitte als Diagonalen, gestrichelte Linien, einfachBdP-Schriften lokal ausgeliefert, WCAG 2.2 AA. Ursprünglich erstellt von Mäx aus dem Stamm der Vaganten; das Original-Theme ist auf stammdervaganten.de zu finden.

@@ -1,0 +1,534 @@
+/* ============================================================
+   Jahresplanung im Dashboard
+   ------------------------------------------------------------
+   Bewusst im Look des Dashboards und nicht im Look der Website:
+   Das hier ist ein Werkzeug, kein Auftritt. Die Stufenfarben
+   sind trotzdem dieselben, weil man sonst beim Wechsel zwischen
+   Planung und Kalender jedes Mal umdenken müsste.
+
+   Hell und dunkel
+   ---------------
+   Concrete stellt das Farbschema auf dem <html>-Element ein:
+   data-bs-theme="light" oder "dark". Bei der Einstellung „auto“
+   setzt es das Attribut selbst aus prefers-color-scheme, bevor
+   der Body steht.
+
+   Deshalb hängt hier alles an genau diesem Attribut und nicht an
+   einer eigenen Media Query. Sonst gäbe es zwei Wahrheiten: Wer
+   im Dashboard ausdrücklich „hell“ wählt, sein Betriebssystem
+   aber auf dunkel stehen hat, bekäme ein helles Dashboard mit
+   einem dunklen Planer darin.
+
+   Alle Farben stehen als Variablen am Anfang. Der Dunkelblock
+   tauscht nur die Werte; keine einzige Regel steht doppelt.
+   ============================================================ */
+
+.v-plan {
+  /* Flächen */
+  --p-flaeche:        #ffffff;
+  --p-flaeche-leise:  #f3f5f7;
+  --p-flaeche-kopf:   #ffffff;
+
+  /* Linien */
+  --p-rahmen:         #d3d9e0;
+  --p-rahmen-fein:    #e3e7eb;
+
+  /* Schrift */
+  --p-text:           #222423;
+  --p-text-leise:     #55595b;
+  --p-warnung:        #b26a00;
+  --p-fehler:         #971B2F;
+
+  /* Ablegeziel beim Ziehen */
+  --p-ziel:           #cfe3ff;
+  --p-ziel-rand:      #0E4278;
+
+  /* Karten: Ideen und Terminkästen. Sie behalten in beiden Themes
+     denselben hellen Grund — die Stufenfarben sind Erkennungs-
+     zeichen aus dem Corporate Design und müssen in Hell wie Dunkel
+     dieselben bleiben und voneinander unterscheidbar. Auf dunklem
+     Grund abgedunkelt oder aufgehellt liefen Pfadiblau, Waldgrün
+     und R*R-Rot ineinander. Also bleibt die Karte hell, und das
+     Theme wechselt darum herum. */
+  --p-karte:          #ffffff;
+  --p-karte-rand:     #d3d9e0;
+  --p-karte-text:     #222423;   /* 15,3:1 auf Weiß ✅ AAA */
+  --p-karte-leise:    #55595b;   /*  7,0:1 auf Weiß ✅ AAA */
+
+  /* Grundfarbe, mit der die Stufenfarbe für Flächen gemischt wird */
+  --p-mischen:        var(--p-karte);
+  --p-mischanteil:    18%;
+  --p-mischanteil-an: 34%;
+
+  /* Kein Zwischentoken für die Stufenfarbe: --p-stufe: var(--stufe)
+     hier oben hätte sich genau einmal aufgelöst, nämlich an diesem
+     Element, und der fertige Wert wäre nach unten vererbt worden.
+     Das per Element gesetzte --stufe eines Kastens wäre nie
+     angekommen — alles Pfadiblau. Die Kästen greifen deshalb
+     direkt auf --stufe zu. */
+
+  /* Schraffuren. Beide neutral: Ein Feiertag gehört keiner Stufe,
+     und Gelb ist hier die Wölflingsstufe — als gelbe Schraffur sah
+     der 3. Oktober aus wie ein Meutentermin. Unterschieden werden
+     Ferien und Feiertag über die Richtung der Schraffur. */
+  --p-ferien:         rgba(169, 187, 206, .55);
+  --p-feiertag:       rgba(85, 89, 91, .22);
+  --p-heute:          #FFD208;
+
+  /* Höhe einer Tageszeile. Der Regler im Kopf schreibt hier
+     hinein; 1.35rem ist die Voreinstellung, bei der ein Jahr auf
+     einem großen Bildschirm gerade so aufgeht. */
+  --p-zeile: 1.35rem;
+
+  --stufe: #0E4278;
+}
+
+[data-bs-theme="dark"] .v-plan {
+  --p-flaeche:        #212529;
+  --p-flaeche-leise:  #2b3035;
+  --p-flaeche-kopf:   #212529;
+
+  --p-rahmen:         #495057;
+  --p-rahmen-fein:    #343a40;
+
+  --p-text:           #e9ecef;   /* 14,6:1 auf #212529 ✅ AAA */
+  --p-text-leise:     #adb5bd;   /*  8,2:1 auf #212529 ✅ AAA */
+  --p-warnung:        #ffc861;
+  --p-fehler:         #ff8a95;
+
+  --p-ziel:           #1c3f66;
+  --p-ziel-rand:      #6ea8fe;
+
+  /* Karte, Mischgrund und Stufenfarbe bleiben unverändert — siehe
+     oben. Dunkel wird die Umgebung, nicht das Geplante. */
+
+  --p-ferien:         rgba(120, 150, 180, .38);
+  --p-feiertag:       rgba(173, 181, 189, .30);
+  --p-heute:          #FFD208;
+}
+
+
+/* --- Kopf --------------------------------------------------- */
+.v-plan__kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.v-plan__jahr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  color: var(--p-text);
+}
+
+.v-plan__stand { margin: 0; color: var(--p-text-leise); }
+.v-plan__entwurfzahl { color: var(--p-warnung); font-weight: 600; }
+
+/* Der Zeilenregler. Wie hoch ein Tag sein muss, hängt davon ab,
+   was man gerade tut: Beim Suchen einer freien Woche will man das
+   ganze Jahr sehen, beim Feilen an einem Monat lesbare Titel. */
+.v-plan__zeile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--p-text-leise);
+  white-space: nowrap;
+}
+
+.v-plan__zeile input[type="range"] {
+  width: 120px;
+  /* 24px hoch, damit der Griff auch mit dem Finger zu treffen ist
+     ✅ WCAG 2.5.8 */
+  min-height: 24px;
+  accent-color: var(--p-ziel-rand);
+}
+
+.v-plan__zeile-wert {
+  min-width: 3.6em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Hinweise ------------------------------------------------
+   Zugeklappt ein Kreis mit „i“, aufgeklappt eine Karte darunter.
+   Die Karte liegt absolut, damit der Kopf beim Aufklappen nicht
+   höher wird und die Monatsspalten nicht springen.
+   ------------------------------------------------------------ */
+.v-plan__hilfe {
+  position: relative;
+  margin: 0;
+}
+
+.v-plan__hilfe-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* 24px in beide Richtungen — Mindestgröße für Zeigegeräte
+     ✅ WCAG 2.5.8 */
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0 4px;
+  border: 1px solid var(--p-rahmen);
+  border-radius: 50%;
+  color: var(--p-text-leise);
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  list-style: none;   /* das Dreieck von <summary> */
+}
+.v-plan__hilfe-knopf::-webkit-details-marker { display: none; }
+.v-plan__hilfe-knopf:hover { border-color: var(--p-ziel-rand); color: var(--p-ziel-rand); }
+
+/* Der Text im Knopf ist für Screenreader da — „i“ allein wäre
+   als Beschriftung nichts wert. Sichtbar wird er nur beim
+   Tastaturfokus, damit klar ist, was gerade dran ist. */
+.v-plan__hilfe-wort {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.v-plan__hilfe[open] .v-plan__hilfe-knopf {
+  border-color: var(--p-ziel-rand);
+  color: var(--p-ziel-rand);
+}
+
+.v-plan__hilfe-text {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: min(60ch, 80vw);
+  padding: 12px 14px;
+  background: var(--p-flaeche);
+  border: 1px solid var(--p-rahmen);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--p-text);
+}
+
+.v-plan__hilfe-text p { margin: 0 0 8px; }
+.v-plan__hilfe-text p:last-child { margin-bottom: 0; }
+
+/* Am rechten Rand klappt die Karte nach links auf, sonst stünde
+   sie halb außerhalb des Fensters. */
+@media (max-width: 900px) {
+  .v-plan__hilfe-text { left: auto; right: 0; }
+}
+
+/* --- Vollbild -------------------------------------------------
+   Zwei Dinge zugleich: Die Fullscreen-API blendet die Leisten des
+   Browsers aus, die Klasse legt den Planer über die Seite und
+   damit über die Werkzeugleiste des Dashboards.
+
+   Beides, weil beides für sich unvollständig wäre. Ohne die Klasse
+   säße im Vollbild das Dashboard-Menü noch daneben; ohne die API
+   bliebe die Adressleiste stehen. Und schlägt die API fehl — in
+   einem iframe etwa oder ohne Nutzergeste — trägt die Klasse
+   allein.
+   ------------------------------------------------------------ */
+.v-plan.ist-vollbild {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  overflow: auto;
+  padding: 16px 20px;
+  background: var(--p-flaeche);
+
+  /* Kopf, Hilfe und Fläche untereinander, die Fläche nimmt den
+     Rest — so scrollt das Jahr für sich und der Ideenspeicher
+     bleibt stehen. */
+  display: flex;
+  flex-direction: column;
+}
+
+.v-plan.ist-vollbild .v-plan__flaeche {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.v-plan.ist-vollbild .v-plan__jahrraster {
+  max-height: 100%;
+  overflow: auto;
+}
+
+.v-plan.ist-vollbild .v-plan__speicher {
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+}
+
+/* Der Backdrop, den der Browser im Vollbild hinter das Element
+   legt, ist standardmäßig schwarz. Ohne das hier blitzte er an
+   den Rändern durch. */
+.v-plan:fullscreen { background: var(--p-flaeche); }
+.v-plan:-webkit-full-screen { background: var(--p-flaeche); }
+
+/* --- Zwei Bereiche ------------------------------------------ */
+.v-plan__flaeche {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .v-plan__flaeche { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- Ideenspeicher ------------------------------------------ */
+.v-plan__speicher {
+  position: sticky;
+  top: 16px;
+  padding: 14px;
+  background: var(--p-flaeche-leise);
+  border: 1px solid var(--p-rahmen);
+  border-radius: 4px;
+  color: var(--p-text);
+}
+
+.v-plan__titel { margin: 0 0 10px; font-size: 16px; color: var(--p-text); }
+
+.v-plan__neu { margin-bottom: 14px; }
+
+.v-plan__ideen { list-style: none; margin: 0; padding: 0; }
+
+.v-plan__idee {
+  position: relative;
+  margin-bottom: 6px;
+  padding: 8px 30px 8px 10px;
+  background: var(--p-karte);
+  border: 1px solid var(--p-karte-rand);
+  border-left: 4px solid var(--stufe, #0E4278);
+  border-radius: 3px;
+  color: var(--p-karte-text);
+  /* grab statt pointer: Es ist kein Link, es ist etwas zum
+     Anfassen. */
+  cursor: grab;
+}
+.v-plan__idee:active { cursor: grabbing; }
+.v-plan__idee.wird-gezogen { opacity: .4; }
+
+.v-plan__idee-titel { display: block; font-weight: 600; font-size: 14px; }
+.v-plan__idee-meta { display: block; font-size: 12px; color: var(--p-karte-leise); }
+
+.v-plan__idee-weg {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--p-karte-leise);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.v-plan__idee-weg:hover { color: #971B2F; }
+
+.v-plan__leer { margin: 0; font-size: 13px; color: var(--p-text-leise); }
+
+/* --- Das Jahr ------------------------------------------------ */
+.v-plan__jahrraster {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(96px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+@media (max-width: 1600px) {
+  .v-plan__jahrraster { grid-template-columns: repeat(6, minmax(120px, 1fr)); }
+}
+@media (max-width: 900px) {
+  .v-plan__jahrraster { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+}
+@media (max-width: 560px) {
+  .v-plan__jahrraster { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
+}
+
+.v-plan__monat-titel {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-text);
+  position: sticky;
+  top: 0;
+  /* Deckend, nicht durchsichtig: Der Titel bleibt beim Scrollen
+     stehen, und darunter laufen die Tageszeilen durch. */
+  background: var(--p-flaeche-kopf);
+  z-index: 2;
+}
+
+.v-plan__tage {
+  display: grid;
+  grid-template-columns: 2.4rem repeat(var(--spuren, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--tage, 31), var(--p-zeile));
+  gap: 1px;
+  background: var(--p-rahmen-fein);
+  border: 1px solid var(--p-rahmen-fein);
+}
+
+.v-plan__tag {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  padding-left: 3px;
+  background: var(--p-flaeche);
+  /* Wächst und schrumpft mit der Zeile — nach oben gedeckelt, weil
+     die Schrift bei 2rem sonst plump würde, nach unten bei 7px,
+     weil darunter auch die Ziffern nur noch Grau ergäben. Am
+     untersten Anschlag ragt die Schrift minimal über die Zeile;
+     Ziffern haben keine Unterlängen, es fällt nicht auf. */
+  font-size: clamp(7px, calc(var(--p-zeile) * .72), 11px);
+  line-height: 1;
+  color: var(--p-text-leise);
+}
+
+.v-plan__tag-nr { min-width: 1.3em; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Das Kürzel schrumpft mit, eine Spur stärker als die Zahl: Es ist
+   die Nebeninformation, und in der schmalen Tagesspalte ist die
+   Zahl das, was man sucht. Untergrenze 6px, damit „Mi“ und „Mo“
+   nicht ununterscheidbar werden. */
+.v-plan__tag-wt {
+  opacity: .65;
+  font-size: clamp(6px, calc(var(--p-zeile) * .58), 10px);
+}
+
+.v-plan.ist-eng .v-plan__kasten { padding: 0 3px; }
+
+.v-plan__tag--wochenende { background: var(--p-flaeche-leise); }
+.v-plan__tag--ferien {
+  background-image: repeating-linear-gradient(
+    45deg, var(--p-ferien) 0 4px, transparent 4px 9px);
+}
+/* Gegenrichtung zu den Ferien. Beide Muster sind neutral gefärbt und
+   unterscheiden sich an der Richtung — sonst bräuchte der Feiertag
+   eine eigene Farbe, und die vier, die es hier gibt, gehören den
+   Stufen. Gelb wäre die Wölflingsstufe gewesen. */
+.v-plan__tag--feiertag {
+  background-image: repeating-linear-gradient(
+    -45deg, var(--p-feiertag) 0 4px, transparent 4px 9px);
+}
+.v-plan__tag--heute { outline: 2px solid var(--p-heute); outline-offset: -2px; z-index: 1; }
+
+/* Beim Ziehen zeigt der Tag unter dem Zeiger, dass er das Ziel ist.
+   Ohne diese Rückmeldung trifft man auf 1,35 rem hohen Zeilen
+   ständig daneben. */
+.v-plan__tag.ist-ziel {
+  background: var(--p-ziel);
+  outline: 2px solid var(--p-ziel-rand);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* --- Terminkästen -------------------------------------------- */
+.v-plan__kasten {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  margin: 1px;
+  padding: 2px 3px;
+  border: 0;
+  border-left: 3px solid var(--stufe, #0E4278);
+  background: color-mix(in srgb, var(--stufe, #0E4278) var(--p-mischanteil), var(--p-mischen));
+  color: var(--p-karte-text);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.15;
+  text-align: left;
+  cursor: grab;
+}
+.v-plan__kasten:active { cursor: grabbing; }
+.v-plan__kasten:hover {
+  background: color-mix(in srgb, var(--stufe, #0E4278) var(--p-mischanteil-an), var(--p-mischen));
+}
+.v-plan__kasten.wird-gezogen { opacity: .4; }
+
+@supports not (background: color-mix(in srgb, red 50%, white)) {
+  .v-plan__kasten { background: var(--p-karte); }
+}
+
+/* Entwürfe sind schraffiert. Sie stehen im Plan, aber noch nicht
+   im Kalender — das muss man auf einen Blick sehen, sonst
+   veröffentlicht am Ende niemand etwas oder alle alles. */
+.v-plan__kasten--entwurf {
+  background-image: repeating-linear-gradient(
+    45deg, color-mix(in srgb, var(--p-mischen) 80%, transparent) 0 5px, transparent 5px 10px);
+  border-left-style: dashed;
+}
+
+.v-plan__kasten-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.v-plan__kasten--vorher { border-top: 2px dashed var(--stufe, #0E4278); }
+.v-plan__kasten--weiter { border-bottom: 2px dashed var(--stufe, #0E4278); }
+
+/* --- Menü ----------------------------------------------------- */
+.v-plan__menue {
+  border: 0;
+  border-top: 5px solid var(--p-heute);
+  border-radius: 4px;
+  padding: 20px;
+  max-width: min(30rem, 94vw);
+  background: var(--p-flaeche);
+  color: var(--p-text);
+  box-shadow: 0 12px 40px rgba(11, 35, 65, .28);
+}
+.v-plan__menue::backdrop { background: rgba(11, 35, 65, .55); }
+
+[data-bs-theme="dark"] .v-plan__menue {
+  /* Auf dunklem Grund trägt ein Schatten nicht mehr. Ein heller
+     Rand hebt den Dialog stattdessen von der Seite ab. */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+  outline: 1px solid var(--p-rahmen);
+}
+[data-bs-theme="dark"] .v-plan__menue::backdrop { background: rgba(0, 0, 0, .65); }
+
+.v-plan__menue-titel { margin: 0 0 4px; font-size: 18px; color: var(--p-text); }
+.v-plan__menue-wann { margin: 0 0 16px; font-size: 13px; color: var(--p-text-leise); }
+
+.v-plan__menue-feld { margin-bottom: 12px; }
+
+.v-plan__menue-knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--p-rahmen-fein);
+}
+
+.v-plan__menue-schluss {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+.v-plan__meldung { font-size: 13px; color: var(--p-text-leise); }
+.v-plan__meldung.ist-fehler { color: var(--p-fehler); font-weight: 600; }
